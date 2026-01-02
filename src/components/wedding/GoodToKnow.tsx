@@ -6,7 +6,7 @@ const GoodToKnow = () => {
     {
       icon: Shirt,
       title: "Klädkod",
-      description: "Kavaj / Klänning. Undvik vitt som är reserverat för bruden.",
+      description: "Kostym. Både ljus och mörk kostym passar fint. Undvik vitt som är reserverat för bruden.",
     },
     {
       icon: Gift,
@@ -31,13 +31,20 @@ const GoodToKnow = () => {
     {
       icon: Heart,
       title: "Tal & Underhållning",
-      description: "Vill du hålla tal eller bidra med underhållning? Kontakta våra toastmasters.",
+      description: "Vill du hålla tal eller bidra med underhållning? Kontakta våra toastmasters Vendela & Lucas.",
     },
   ];
 
   return (
-    <section className="py-24 bg-secondary">
-      <div className="container mx-auto px-6">
+    <section className="py-24 bg-secondary relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-20 right-20 w-48 h-48 rounded-full bg-blush/25 blur-3xl" />
+        <div className="absolute bottom-20 left-20 w-56 h-56 rounded-full bg-sage-light/30 blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-soft-pink/20 blur-3xl" />
+      </div>
+
+      <div className="container mx-auto px-6 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -48,7 +55,7 @@ const GoodToKnow = () => {
           <h2 className="text-4xl md:text-5xl font-serif font-light text-foreground mb-4">
             Bra att veta
           </h2>
-          <div className="w-24 h-px bg-primary/40 mx-auto" />
+          <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent mx-auto" />
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
@@ -59,11 +66,14 @@ const GoodToKnow = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-card p-6 rounded-lg shadow-soft"
+              className="bg-gradient-card p-6 rounded-xl shadow-soft border border-blush/20 hover:shadow-card hover:-translate-y-1 transition-all duration-300"
             >
-              <div className="w-12 h-12 mb-4 rounded-full bg-accent flex items-center justify-center">
+              <motion.div 
+                className="w-12 h-12 mb-4 rounded-full bg-gradient-to-br from-accent to-blush/40 flex items-center justify-center"
+                whileHover={{ rotate: 5, scale: 1.05 }}
+              >
                 <item.icon className="w-6 h-6 text-primary" />
-              </div>
+              </motion.div>
               
               <h3 className="text-xl font-serif mb-2 text-foreground">
                 {item.title}
