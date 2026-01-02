@@ -3,7 +3,6 @@ import HeroSection from "@/components/wedding/HeroSection";
 import WeddingDetails from "@/components/wedding/WeddingDetails";
 import TravelInfo from "@/components/wedding/TravelInfo";
 import GoodToKnow from "@/components/wedding/GoodToKnow";
-import QRCodeSection from "@/components/wedding/QRCodeSection";
 import PhotoGallery from "@/components/wedding/PhotoGallery";
 import Footer from "@/components/wedding/Footer";
 
@@ -21,7 +20,6 @@ const Index = () => {
       <div id="info">
         <GoodToKnow />
       </div>
-      <QRCodeSection />
       <PhotoGallery />
       <Footer />
     </div>

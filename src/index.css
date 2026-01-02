@@ -46,17 +46,21 @@
     --sage-light: 140 20% 90%;
     --ivory: 40 33% 98%;
     --cream: 35 40% 94%;
-    --blush: 350 30% 90%;
+    --blush: 350 35% 88%;
+    --blush-dark: 350 30% 75%;
     --charcoal: 30 10% 25%;
     --gold: 40 60% 50%;
+    --dusty-rose: 350 25% 70%;
+    --soft-pink: 350 40% 92%;
 
     /* Gradients */
-    --gradient-hero: linear-gradient(180deg, hsl(40 33% 98%) 0%, hsl(35 40% 94%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(40 40% 99%) 0%, hsl(35 30% 96%) 100%);
+    --gradient-hero: linear-gradient(180deg, hsl(40 33% 98%) 0%, hsl(350 35% 95%) 50%, hsl(35 40% 94%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(40 40% 99%) 0%, hsl(350 40% 97%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(140 25% 45%) 0%, hsl(140 30% 55%) 100%);
 
     /* Shadows */
     --shadow-soft: 0 4px 20px -4px hsl(30 10% 25% / 0.08);
-    --shadow-card: 0 8px 30px -8px hsl(30 10% 25% / 0.1);
+    --shadow-card: 0 8px 30px -8px hsl(350 30% 50% / 0.12);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
