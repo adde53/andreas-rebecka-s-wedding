@@ -1,12 +1,29 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import Navigation from "@/components/wedding/Navigation";
+import HeroSection from "@/components/wedding/HeroSection";
+import WeddingDetails from "@/components/wedding/WeddingDetails";
+import TravelInfo from "@/components/wedding/TravelInfo";
+import GoodToKnow from "@/components/wedding/GoodToKnow";
+import QRCodeSection from "@/components/wedding/QRCodeSection";
+import PhotoGallery from "@/components/wedding/PhotoGallery";
+import Footer from "@/components/wedding/Footer";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      <HeroSection />
+      <div id="details">
+        <WeddingDetails />
       </div>
+      <div id="travel">
+        <TravelInfo />
+      </div>
+      <div id="info">
+        <GoodToKnow />
+      </div>
+      <QRCodeSection />
+      <PhotoGallery />
+      <Footer />
     </div>
   );
 };
