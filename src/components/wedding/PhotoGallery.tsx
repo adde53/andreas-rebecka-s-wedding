@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, Camera, X, Loader2, Image as ImageIcon } from "lucide-react";
+import { Upload, Camera, X, Loader2, Image as ImageIcon, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +13,7 @@ interface Photo {
   uploaded_by: string | null;
   caption: string | null;
   created_at: string;
+  approved: boolean;
 }
 
 const PhotoGallery = () => {
@@ -21,10 +22,13 @@ const PhotoGallery = () => {
   const [uploaderName, setUploaderName] = useState("");
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const [loading, setLoading] = useState(true);
+  const [uploadsEnabled, setUploadsEnabled] = useState(false);
+  const [uploadEnabledFrom, setUploadEnabledFrom] = useState<Date | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchPhotos();
+    checkUploadStatus();
   }, []);
 
   const fetchPhotos = async () => {
@@ -32,6 +36,7 @@ const PhotoGallery = () => {
       const { data, error } = await supabase
         .from("photos")
         .select("*")
+        .eq("approved", true)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -43,9 +48,37 @@ const PhotoGallery = () => {
     }
   };
 
+  const checkUploadStatus = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("wedding_settings")
+        .select("upload_enabled_from")
+        .maybeSingle();
+
+      if (error) throw error;
+      
+      if (data?.upload_enabled_from) {
+        const enabledDate = new Date(data.upload_enabled_from);
+        setUploadEnabledFrom(enabledDate);
+        setUploadsEnabled(enabledDate <= new Date());
+      }
+    } catch (error) {
+      console.error("Error checking upload status:", error);
+    }
+  };
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
+
+    if (!uploadsEnabled) {
+      toast({
+        title: "Uppladdning ej tillgänglig",
+        description: "Bilduppladdning öppnar vid bröllopet.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setUploading(true);
 
@@ -74,10 +107,9 @@ const PhotoGallery = () => {
 
       toast({
         title: "Uppladdning klar!",
-        description: "Tack för att du delar med dig av dina bilder!",
+        description: "Tack! Dina bilder väntar på godkännande av brudparet.",
       });
 
-      fetchPhotos();
     } catch (error) {
       console.error("Error uploading:", error);
       toast({
@@ -98,8 +130,14 @@ const PhotoGallery = () => {
   };
 
   return (
-    <section className="py-24 bg-background" id="gallery">
-      <div className="container mx-auto px-6">
+    <section className="py-24 bg-background relative overflow-hidden" id="gallery">
+      {/* Decorative background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-10 left-10 w-40 h-40 rounded-full bg-blush/20 blur-3xl" />
+        <div className="absolute bottom-10 right-10 w-48 h-48 rounded-full bg-sage-light/25 blur-3xl" />
+      </div>
+
+      <div className="container mx-auto px-6 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -110,7 +148,7 @@ const PhotoGallery = () => {
           <h2 className="text-4xl md:text-5xl font-serif font-light text-foreground mb-4">
             Fotogalleri
           </h2>
-          <div className="w-24 h-px bg-primary/40 mx-auto mb-6" />
+          <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent mx-auto mb-6" />
           <p className="text-muted-foreground font-body max-w-xl mx-auto">
             Dela dina bilder från festen! Vi samlar alla minnen här så att vi kan uppleva dagen igen.
           </p>
@@ -124,49 +162,72 @@ const PhotoGallery = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="max-w-md mx-auto mb-16"
         >
-          <div className="bg-card p-6 rounded-lg shadow-card">
-            <div className="mb-4">
-              <label className="block text-sm font-body text-muted-foreground mb-2">
-                Ditt namn (valfritt)
-              </label>
-              <Input
-                type="text"
-                placeholder="Ange ditt namn"
-                value={uploaderName}
-                onChange={(e) => setUploaderName(e.target.value)}
-                className="font-body"
-              />
-            </div>
+          <div className="bg-gradient-card p-6 rounded-xl shadow-card border border-blush/20">
+            {uploadsEnabled ? (
+              <>
+                <div className="mb-4">
+                  <label className="block text-sm font-body text-muted-foreground mb-2">
+                    Ditt namn (valfritt)
+                  </label>
+                  <Input
+                    type="text"
+                    placeholder="Ange ditt namn"
+                    value={uploaderName}
+                    onChange={(e) => setUploaderName(e.target.value)}
+                    className="font-body"
+                  />
+                </div>
 
-            <label className="relative block">
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleFileUpload}
-                disabled={uploading}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-              />
-              <Button
-                className="w-full font-body"
-                disabled={uploading}
-                asChild
-              >
-                <span>
-                  {uploading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Laddar upp...
-                    </>
-                  ) : (
-                    <>
-                      <Camera className="w-4 h-4 mr-2" />
-                      Ladda upp bilder
-                    </>
-                  )}
-                </span>
-              </Button>
-            </label>
+                <label className="relative block">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleFileUpload}
+                    disabled={uploading}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                  />
+                  <Button
+                    className="w-full font-body"
+                    disabled={uploading}
+                    asChild
+                  >
+                    <span>
+                      {uploading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Laddar upp...
+                        </>
+                      ) : (
+                        <>
+                          <Camera className="w-4 h-4 mr-2" />
+                          Ladda upp bilder
+                        </>
+                      )}
+                    </span>
+                  </Button>
+                </label>
+                <p className="text-xs text-muted-foreground font-body mt-3 text-center">
+                  Bilder granskas av brudparet innan de visas i galleriet
+                </p>
+              </>
+            ) : (
+              <div className="text-center py-4">
+                <Lock className="w-8 h-8 mx-auto text-muted-foreground/50 mb-3" />
+                <p className="text-muted-foreground font-body">
+                  Bilduppladdning öppnar vid bröllopet
+                </p>
+                {uploadEnabledFrom && (
+                  <p className="text-sm text-primary font-body mt-2">
+                    {uploadEnabledFrom.toLocaleDateString("sv-SE", { 
+                      day: "numeric", 
+                      month: "long", 
+                      year: "numeric" 
+                    })}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </motion.div>
 
@@ -198,14 +259,14 @@ const PhotoGallery = () => {
                 className="aspect-square cursor-pointer group"
                 onClick={() => setSelectedPhoto(photo)}
               >
-                <div className="relative w-full h-full rounded-lg overflow-hidden shadow-soft group-hover:shadow-card transition-shadow">
+                <div className="relative w-full h-full rounded-xl overflow-hidden shadow-soft group-hover:shadow-card transition-all duration-300 group-hover:-translate-y-1">
                   <img
                     src={getImageUrl(photo.file_path)}
                     alt={photo.file_name}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="absolute bottom-3 left-3 text-white text-sm font-body">
                       {photo.uploaded_by}
                     </div>
