@@ -1,5 +1,6 @@
 import Navigation from "@/components/wedding/Navigation";
 import HeroSection from "@/components/wedding/HeroSection";
+import Countdown from "@/components/wedding/Countdown";
 import WeddingDetails from "@/components/wedding/WeddingDetails";
 import TravelInfo from "@/components/wedding/TravelInfo";
 import GoodToKnow from "@/components/wedding/GoodToKnow";
@@ -11,6 +12,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       <HeroSection />
+      <Countdown />
       <div id="details">
         <WeddingDetails />
       </div>
