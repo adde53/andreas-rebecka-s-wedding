@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-const WEDDING_DATE = new Date("2025-08-23T14:45:00");
+const WEDDING_DATE = new Date("2026-05-30T14:45:00");
 
 interface TimeLeft {
   days: number;
@@ -62,7 +62,7 @@ const Countdown = () => {
             Nedräkning till bröllopet
           </h2>
           <p className="text-muted-foreground font-body mb-8">
-            23 augusti 2025
+            30 maj 2026 kl 14:45
           </p>
 
           <div className="flex justify-center gap-3 md:gap-6">

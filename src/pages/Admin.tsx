@@ -461,39 +461,90 @@ const Admin = () => {
             <div className="max-w-md">
               <div className="bg-card p-6 rounded-xl shadow-soft border border-blush/20">
                 <h2 className="text-xl font-serif mb-4 text-foreground">
-                  Uppladdningsdatum
+                  Uppladdning av bilder
                 </h2>
                 <p className="text-sm text-muted-foreground font-body mb-4">
-                  Gäster kan bara ladda upp bilder från och med det valda datumet.
+                  Gäster kan bara ladda upp bilder från och med det valda datumet och tiden.
                 </p>
 
                 <div className="space-y-4">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !uploadDate && "text-muted-foreground"
-                        )}
-                      >
-                        <Calendar className="mr-2 h-4 w-4" />
-                        {uploadDate ? (
-                          format(uploadDate, "d MMMM yyyy", { locale: sv })
-                        ) : (
-                          "Välj datum"
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <CalendarComponent
-                        mode="single"
-                        selected={uploadDate}
-                        onSelect={setUploadDate}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <div className="space-y-2">
+                    <label className="text-sm font-body text-foreground">Datum</label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !uploadDate && "text-muted-foreground"
+                          )}
+                        >
+                          <Calendar className="mr-2 h-4 w-4" />
+                          {uploadDate ? (
+                            format(uploadDate, "d MMMM yyyy", { locale: sv })
+                          ) : (
+                            "Välj datum"
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <CalendarComponent
+                          mode="single"
+                          selected={uploadDate}
+                          onSelect={(date) => {
+                            if (date) {
+                              // Preserve the time from existing uploadDate
+                              const hours = uploadDate?.getHours() ?? 12;
+                              const minutes = uploadDate?.getMinutes() ?? 0;
+                              date.setHours(hours, minutes, 0, 0);
+                            }
+                            setUploadDate(date);
+                          }}
+                          initialFocus
+                          className="pointer-events-auto"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  {uploadDate && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-body text-foreground">Tid</label>
+                      <div className="flex gap-2">
+                        <select
+                          value={uploadDate.getHours()}
+                          onChange={(e) => {
+                            const newDate = new Date(uploadDate);
+                            newDate.setHours(parseInt(e.target.value));
+                            setUploadDate(newDate);
+                          }}
+                          className="flex-1 h-10 px-3 rounded-md border border-input bg-background text-sm"
+                        >
+                          {Array.from({ length: 24 }, (_, i) => (
+                            <option key={i} value={i}>
+                              {i.toString().padStart(2, "0")}
+                            </option>
+                          ))}
+                        </select>
+                        <span className="flex items-center text-muted-foreground">:</span>
+                        <select
+                          value={uploadDate.getMinutes()}
+                          onChange={(e) => {
+                            const newDate = new Date(uploadDate);
+                            newDate.setMinutes(parseInt(e.target.value));
+                            setUploadDate(newDate);
+                          }}
+                          className="flex-1 h-10 px-3 rounded-md border border-input bg-background text-sm"
+                        >
+                          {Array.from({ length: 60 }, (_, i) => (
+                            <option key={i} value={i}>
+                              {i.toString().padStart(2, "0")}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="flex gap-2">
                     <Button
