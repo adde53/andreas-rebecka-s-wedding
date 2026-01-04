@@ -11,12 +11,15 @@ import {
   Loader2, 
   Calendar,
   Image as ImageIcon,
-  Settings
+  Settings,
+  Download,
+  Eye
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,6 +46,8 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [uploadDate, setUploadDate] = useState<Date | undefined>();
   const [savingDate, setSavingDate] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+  const [downloading, setDownloading] = useState(false);
   
   const { user, isAdmin, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
@@ -201,6 +206,61 @@ const Admin = () => {
     return data.publicUrl;
   };
 
+  const handleDownloadAll = async () => {
+    setDownloading(true);
+    try {
+      for (const photo of photos) {
+        const url = getImageUrl(photo.file_path);
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = photo.file_name;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+        // Small delay between downloads
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+      toast({
+        title: "Nedladdning klar!",
+        description: `${photos.length} bilder har laddats ner`,
+      });
+    } catch (error) {
+      console.error("Error downloading photos:", error);
+      toast({
+        title: "Fel",
+        description: "Kunde inte ladda ner bilderna",
+        variant: "destructive",
+      });
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const handleDownloadSingle = async (photo: Photo) => {
+    try {
+      const url = getImageUrl(photo.file_path);
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = photo.file_name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    } catch (error) {
+      console.error("Error downloading photo:", error);
+      toast({
+        title: "Fel",
+        description: "Kunde inte ladda ner bilden",
+        variant: "destructive",
+      });
+    }
+  };
+
   const pendingPhotos = photos.filter(p => !p.approved);
   const approvedPhotos = photos.filter(p => p.approved);
 
@@ -249,6 +309,24 @@ const Admin = () => {
           </TabsList>
 
           <TabsContent value="photos" className="space-y-8">
+            {/* Download all button */}
+            {photos.length > 0 && (
+              <div className="flex justify-end">
+                <Button
+                  onClick={handleDownloadAll}
+                  disabled={downloading}
+                  variant="outline"
+                >
+                  {downloading ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Download className="w-4 h-4 mr-2" />
+                  )}
+                  Ladda ner alla ({photos.length})
+                </Button>
+              </div>
+            )}
+
             {/* Pending photos */}
             <section>
               <h2 className="text-xl font-serif mb-4 text-foreground">
@@ -268,7 +346,10 @@ const Admin = () => {
                       animate={{ opacity: 1, scale: 1 }}
                       className="relative group"
                     >
-                      <div className="aspect-square rounded-lg overflow-hidden shadow-soft">
+                      <div 
+                        className="aspect-square rounded-lg overflow-hidden shadow-soft cursor-pointer"
+                        onClick={() => setSelectedPhoto(photo)}
+                      >
                         <img
                           src={getImageUrl(photo.file_path)}
                           alt={photo.file_name}
@@ -276,6 +357,13 @@ const Admin = () => {
                         />
                       </div>
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => setSelectedPhoto(photo)}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
                         <Button
                           size="sm"
                           variant="secondary"
@@ -319,7 +407,10 @@ const Admin = () => {
                       animate={{ opacity: 1, scale: 1 }}
                       className="relative group"
                     >
-                      <div className="aspect-square rounded-lg overflow-hidden shadow-soft ring-2 ring-primary/20">
+                      <div 
+                        className="aspect-square rounded-lg overflow-hidden shadow-soft ring-2 ring-primary/20 cursor-pointer"
+                        onClick={() => setSelectedPhoto(photo)}
+                      >
                         <img
                           src={getImageUrl(photo.file_path)}
                           alt={photo.file_name}
@@ -327,6 +418,20 @@ const Admin = () => {
                         />
                       </div>
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => setSelectedPhoto(photo)}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => handleDownloadSingle(photo)}
+                        >
+                          <Download className="w-4 h-4" />
+                        </Button>
                         <Button
                           size="sm"
                           variant="outline"
@@ -422,6 +527,70 @@ const Admin = () => {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* Photo preview dialog */}
+      <Dialog open={!!selectedPhoto} onOpenChange={() => setSelectedPhoto(null)}>
+        <DialogContent className="max-w-4xl p-0 overflow-hidden">
+          <DialogTitle className="sr-only">
+            Förhandsvisning av bild
+          </DialogTitle>
+          {selectedPhoto && (
+            <div className="relative">
+              <img
+                src={getImageUrl(selectedPhoto.file_path)}
+                alt={selectedPhoto.file_name}
+                className="w-full h-auto max-h-[80vh] object-contain"
+              />
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-white font-body text-sm">
+                      {selectedPhoto.uploaded_by || "Okänd"}
+                    </p>
+                    <p className="text-white/70 font-body text-xs">
+                      {format(new Date(selectedPhoto.created_at), "d MMMM yyyy 'kl' HH:mm", { locale: sv })}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => handleDownloadSingle(selectedPhoto)}
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Ladda ner
+                    </Button>
+                    {!selectedPhoto.approved ? (
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          handleApprove(selectedPhoto.id, true);
+                          setSelectedPhoto(null);
+                        }}
+                      >
+                        <Check className="w-4 h-4 mr-2" />
+                        Godkänn
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          handleApprove(selectedPhoto.id, false);
+                          setSelectedPhoto(null);
+                        }}
+                      >
+                        <X className="w-4 h-4 mr-2" />
+                        Neka
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
