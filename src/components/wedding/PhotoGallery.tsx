@@ -130,11 +130,12 @@ const PhotoGallery = () => {
   };
 
   return (
-    <section className="py-24 bg-background relative overflow-hidden" id="gallery">
+    <section className="py-24 bg-gradient-to-b from-soft-pink/30 via-blush/20 to-background relative overflow-hidden" id="gallery">
       {/* Decorative background */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-10 left-10 w-40 h-40 rounded-full bg-blush/20 blur-3xl" />
-        <div className="absolute bottom-10 right-10 w-48 h-48 rounded-full bg-sage-light/25 blur-3xl" />
+        <div className="absolute top-10 left-10 w-40 h-40 rounded-full bg-blush/30 blur-3xl" />
+        <div className="absolute bottom-10 right-10 w-48 h-48 rounded-full bg-dusty-rose/20 blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-soft-pink/20 blur-3xl" />
       </div>
 
       <div className="container mx-auto px-6 relative z-10">
@@ -145,10 +146,19 @@ const PhotoGallery = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-12"
         >
+          <motion.div
+            initial={{ scale: 0 }}
+            whileInView={{ scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-blush to-dusty-rose/50 flex items-center justify-center"
+          >
+            <Camera className="w-8 h-8 text-foreground/70" />
+          </motion.div>
           <h2 className="text-4xl md:text-5xl font-serif font-light text-foreground mb-4">
             Fotogalleri
           </h2>
-          <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent mx-auto mb-6" />
+          <div className="w-24 h-px bg-gradient-to-r from-transparent via-dusty-rose/60 to-transparent mx-auto mb-6" />
           <p className="text-muted-foreground font-body max-w-xl mx-auto">
             Dela dina bilder från festen! Vi samlar alla minnen här så att vi kan uppleva dagen igen.
           </p>
@@ -162,7 +172,7 @@ const PhotoGallery = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="max-w-md mx-auto mb-16"
         >
-          <div className="bg-gradient-card p-6 rounded-xl shadow-card border border-blush/20">
+          <div className="bg-gradient-to-br from-card via-soft-pink/20 to-blush/30 p-6 rounded-2xl shadow-card border border-blush/30 backdrop-blur-sm">
             {uploadsEnabled ? (
               <>
                 <div className="mb-4">
@@ -248,7 +258,7 @@ const PhotoGallery = () => {
             </p>
           </motion.div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {photos.map((photo, index) => (
               <motion.div
                 key={photo.id}
@@ -259,18 +269,14 @@ const PhotoGallery = () => {
                 className="aspect-square cursor-pointer group"
                 onClick={() => setSelectedPhoto(photo)}
               >
-                <div className="relative w-full h-full rounded-xl overflow-hidden shadow-soft group-hover:shadow-card transition-all duration-300 group-hover:-translate-y-1">
+                <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-card border-2 border-blush/20 group-hover:border-dusty-rose/40 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-lg">
                   <img
                     src={getImageUrl(photo.file_path)}
                     alt={photo.file_name}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="absolute bottom-3 left-3 text-white text-sm font-body">
-                      {photo.uploaded_by}
-                    </div>
-                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-dusty-rose/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
               </motion.div>
             ))}
@@ -302,11 +308,6 @@ const PhotoGallery = () => {
                 className="max-w-full max-h-[90vh] object-contain rounded-lg"
                 onClick={(e) => e.stopPropagation()}
               />
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-center">
-                <p className="font-body text-sm opacity-80">
-                  Uppladdad av {selectedPhoto.uploaded_by}
-                </p>
-              </div>
             </motion.div>
           )}
         </AnimatePresence>

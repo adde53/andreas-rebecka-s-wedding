@@ -379,9 +379,6 @@ const Admin = () => {
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
-                      <p className="mt-2 text-xs text-muted-foreground font-body truncate">
-                        {photo.uploaded_by}
-                      </p>
                     </motion.div>
                   ))}
                 </div>
@@ -447,9 +444,6 @@ const Admin = () => {
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
-                      <p className="mt-2 text-xs text-muted-foreground font-body truncate">
-                        {photo.uploaded_by}
-                      </p>
                     </motion.div>
                   ))}
                 </div>
