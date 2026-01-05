@@ -130,12 +130,13 @@ const PhotoGallery = () => {
   };
 
   return (
-    <section className="py-24 bg-gradient-to-b from-soft-pink/30 via-blush/20 to-background relative overflow-hidden" id="gallery">
-      {/* Decorative background */}
+    <section className="py-24 bg-gradient-to-b from-soft-pink/20 via-blush/10 to-background relative overflow-hidden" id="gallery">
+      {/* Decorative background elements */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-10 left-10 w-40 h-40 rounded-full bg-blush/30 blur-3xl" />
-        <div className="absolute bottom-10 right-10 w-48 h-48 rounded-full bg-dusty-rose/20 blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-soft-pink/20 blur-3xl" />
+        <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-dusty-rose/10 to-transparent" />
+        <div className="absolute top-20 left-10 w-64 h-64 rounded-full bg-blush/20 blur-3xl" />
+        <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-soft-pink/20 blur-3xl" />
+        <div className="absolute top-1/3 right-1/4 w-48 h-48 rounded-full bg-dusty-rose/15 blur-3xl" />
       </div>
 
       <div className="container mx-auto px-6 relative z-10">
@@ -144,23 +145,27 @@ const PhotoGallery = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
           <motion.div
-            initial={{ scale: 0 }}
-            whileInView={{ scale: 1 }}
+            initial={{ scale: 0, rotate: -10 }}
+            whileInView={{ scale: 1, rotate: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-blush to-dusty-rose/50 flex items-center justify-center"
+            transition={{ duration: 0.6, type: "spring" }}
+            className="w-20 h-20 mx-auto mb-8 rounded-full bg-gradient-to-br from-blush via-soft-pink to-dusty-rose/50 flex items-center justify-center shadow-lg"
           >
-            <Camera className="w-8 h-8 text-foreground/70" />
+            <Camera className="w-9 h-9 text-foreground/80" />
           </motion.div>
-          <h2 className="text-4xl md:text-5xl font-serif font-light text-foreground mb-4">
+          <h2 className="text-4xl md:text-6xl font-serif font-light text-foreground mb-4 tracking-wide">
             Fotogalleri
           </h2>
-          <div className="w-24 h-px bg-gradient-to-r from-transparent via-dusty-rose/60 to-transparent mx-auto mb-6" />
-          <p className="text-muted-foreground font-body max-w-xl mx-auto">
-            Dela dina bilder från festen! Vi samlar alla minnen här så att vi kan uppleva dagen igen.
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="w-16 h-px bg-gradient-to-r from-transparent to-dusty-rose/60" />
+            <div className="w-2 h-2 rounded-full bg-dusty-rose/60" />
+            <div className="w-16 h-px bg-gradient-to-l from-transparent to-dusty-rose/60" />
+          </div>
+          <p className="text-muted-foreground font-body max-w-lg mx-auto text-lg leading-relaxed">
+            Dela dina minnen från festen med oss
           </p>
         </motion.div>
 
@@ -244,39 +249,45 @@ const PhotoGallery = () => {
         {/* Photo grid */}
         {loading ? (
           <div className="flex justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <Loader2 className="w-8 h-8 animate-spin text-dusty-rose" />
           </div>
         ) : photos.length === 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-16"
+            className="text-center py-20"
           >
-            <ImageIcon className="w-16 h-16 mx-auto text-muted-foreground/30 mb-4" />
-            <p className="text-muted-foreground font-body">
-              Inga bilder uppladdade ännu. Var först med att dela!
+            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-blush/30 to-soft-pink/20 flex items-center justify-center">
+              <ImageIcon className="w-12 h-12 text-muted-foreground/40" />
+            </div>
+            <p className="text-muted-foreground font-body text-lg">
+              Inga bilder uppladdade ännu
+            </p>
+            <p className="text-muted-foreground/60 font-body text-sm mt-2">
+              Var först med att dela dina minnen!
             </p>
           </motion.div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+          <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
             {photos.map((photo, index) => (
               <motion.div
                 key={photo.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: index * 0.05 }}
-                className="aspect-square cursor-pointer group"
+                transition={{ duration: 0.5, delay: index * 0.03 }}
+                className="break-inside-avoid cursor-pointer group"
                 onClick={() => setSelectedPhotoIndex(index)}
               >
-                <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-card border-2 border-blush/20 group-hover:border-dusty-rose/40 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-lg">
+                <div className="relative overflow-hidden rounded-2xl shadow-soft border border-blush/30 group-hover:border-dusty-rose/50 transition-all duration-500 group-hover:shadow-lg group-hover:-translate-y-1">
                   <img
                     src={getImageUrl(photo.file_path)}
                     alt={photo.file_name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-dusty-rose/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-dusty-rose/40 via-transparent to-soft-pink/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute inset-0 ring-2 ring-inset ring-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
               </motion.div>
             ))}
