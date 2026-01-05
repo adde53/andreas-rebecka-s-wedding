@@ -175,20 +175,6 @@ const HeroSection = () => {
           </motion.div>
         </motion.div>
 
-        {/* Enhanced scroll indicator */}
-        <motion.div
-          className="absolute bottom-10 left-1/2 -translate-x-1/2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          <div className="w-6 h-10 border-2 border-primary/40 rounded-full flex justify-center pt-2 backdrop-blur-sm">
-            <motion.div 
-              className="w-1.5 h-2.5 bg-primary/60 rounded-full"
-              animate={{ y: [0, 8, 0], opacity: [1, 0.3, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            />
-          </div>
-        </motion.div>
       </div>
     </section>
   );

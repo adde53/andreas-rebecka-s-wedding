@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-const WEDDING_DATE = new Date("2026-05-30T14:45:00");
+const WEDDING_DATE = new Date("2026-05-30T14:30:00");
 
 interface TimeLeft {
   days: number;
@@ -46,10 +46,11 @@ const Countdown = () => {
   ];
 
   return (
-    <section className="py-16 bg-gradient-to-b from-accent/30 to-background relative overflow-hidden">
+    <section className="py-16 bg-gradient-to-b from-background via-soft-pink/20 to-blush/30 relative overflow-hidden">
       {/* Decorative elements */}
-      <div className="absolute top-0 left-0 w-32 h-32 bg-blush/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-0 w-40 h-40 bg-dusty-rose/10 rounded-full blur-3xl" />
+      <div className="absolute top-0 left-0 w-32 h-32 bg-dusty-rose/20 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 right-0 w-40 h-40 bg-blush/30 rounded-full blur-3xl" />
+      <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-soft-pink/30 rounded-full blur-2xl" />
       
       <div className="container mx-auto px-6 text-center relative z-10">
         <motion.div
@@ -62,7 +63,7 @@ const Countdown = () => {
             Nedräkning till bröllopet
           </h2>
           <p className="text-muted-foreground font-body mb-8">
-            30 maj 2026 kl 14:45
+            30 maj 2026 kl 14:30
           </p>
 
           <div className="flex justify-center gap-3 md:gap-6">
@@ -75,7 +76,7 @@ const Countdown = () => {
                 transition={{ duration: 0.4, delay: index * 0.1 }}
                 className="flex flex-col items-center"
               >
-                <div className="w-16 h-16 md:w-20 md:h-20 bg-card rounded-xl shadow-soft border border-blush/20 flex items-center justify-center mb-2">
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-card to-blush/40 rounded-xl shadow-card border border-dusty-rose/20 flex items-center justify-center mb-2">
                   <span className="text-2xl md:text-3xl font-serif text-foreground">
                     {block.value.toString().padStart(2, "0")}
                   </span>
