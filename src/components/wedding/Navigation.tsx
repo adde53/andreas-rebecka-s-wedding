@@ -22,11 +22,15 @@ const Navigation = () => {
   ];
 
   const scrollToSection = (href: string) => {
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
     setIsMobileMenuOpen(false);
+    // Small delay to allow menu to close before scrolling
+    setTimeout(() => {
+      const sectionId = href.replace("#", "");
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
   };
 
   return (
