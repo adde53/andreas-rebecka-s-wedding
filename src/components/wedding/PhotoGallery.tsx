@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, Camera, X, Loader2, Image as ImageIcon, Lock } from "lucide-react";
+import { Upload, Camera, X, Loader2, Image as ImageIcon, Lock, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -20,7 +20,7 @@ const PhotoGallery = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploaderName, setUploaderName] = useState("");
-  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploadsEnabled, setUploadsEnabled] = useState(false);
   const [uploadEnabledFrom, setUploadEnabledFrom] = useState<Date | null>(null);
@@ -267,7 +267,7 @@ const PhotoGallery = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.05 }}
                 className="aspect-square cursor-pointer group"
-                onClick={() => setSelectedPhoto(photo)}
+                onClick={() => setSelectedPhotoIndex(index)}
               >
                 <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-card border-2 border-blush/20 group-hover:border-dusty-rose/40 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-lg">
                   <img
@@ -283,31 +283,67 @@ const PhotoGallery = () => {
           </div>
         )}
 
-        {/* Lightbox */}
+        {/* Lightbox with navigation */}
         <AnimatePresence>
-          {selectedPhoto && (
+          {selectedPhotoIndex !== null && photos[selectedPhotoIndex] && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
-              onClick={() => setSelectedPhoto(null)}
+              onClick={() => setSelectedPhotoIndex(null)}
             >
+              {/* Close button */}
               <button
-                className="absolute top-4 right-4 text-white/80 hover:text-white"
-                onClick={() => setSelectedPhoto(null)}
+                className="absolute top-4 right-4 text-white/80 hover:text-white z-10"
+                onClick={() => setSelectedPhotoIndex(null)}
               >
                 <X className="w-8 h-8" />
               </button>
+
+              {/* Previous button */}
+              {selectedPhotoIndex > 0 && (
+                <button
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white z-10 p-2 rounded-full bg-black/30 hover:bg-black/50 transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedPhotoIndex(selectedPhotoIndex - 1);
+                  }}
+                >
+                  <ChevronLeft className="w-8 h-8" />
+                </button>
+              )}
+
+              {/* Next button */}
+              {selectedPhotoIndex < photos.length - 1 && (
+                <button
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white z-10 p-2 rounded-full bg-black/30 hover:bg-black/50 transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedPhotoIndex(selectedPhotoIndex + 1);
+                  }}
+                >
+                  <ChevronRight className="w-8 h-8" />
+                </button>
+              )}
+
+              {/* Image */}
               <motion.img
-                initial={{ scale: 0.9 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0.9 }}
-                src={getImageUrl(selectedPhoto.file_path)}
-                alt={selectedPhoto.file_name}
+                key={photos[selectedPhotoIndex].id}
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                src={getImageUrl(photos[selectedPhotoIndex].file_path)}
+                alt={photos[selectedPhotoIndex].file_name}
                 className="max-w-full max-h-[90vh] object-contain rounded-lg"
                 onClick={(e) => e.stopPropagation()}
               />
+
+              {/* Photo counter */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/70 font-body text-sm">
+                {selectedPhotoIndex + 1} / {photos.length}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
