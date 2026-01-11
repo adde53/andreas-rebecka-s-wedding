@@ -6,7 +6,7 @@ const GoodToKnow = () => {
     {
       icon: Shirt,
       title: "Klädkod",
-      description: "Kostym. Både ljus och mörk kostym passar fint. Undvik vitt som är reserverat för bruden.",
+      description: "Mörk kostym. Mörk kostym är vår riktlinje för klädseln. För herrar går det utmärkt med både ljus och mörk kostym. För damer innebär klädkoden en högtidlig och stilren klänning eller motsvarande.",
     },
     {
       icon: Gift,
@@ -31,7 +31,7 @@ const GoodToKnow = () => {
     {
       icon: Heart,
       title: "Tal & Underhållning",
-      description: "Vill du hålla tal eller bidra med underhållning? Kontakta våra toastmasters Vendela & Lucas.",
+      description: "Vill du hålla tal eller bidra med underhållning? Kontakta våra toastmasters Vendela (070-053 90 29) eller Lucas (076-818 15 63) senast 30 April",
     },
   ];
 
