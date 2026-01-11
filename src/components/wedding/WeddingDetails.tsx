@@ -8,14 +8,14 @@ const WeddingDetails = () => {
       title: "Vigsel",
       time: "14:30",
       location: "Lidingö kyrka",
-      address: "Stockholmsvägen 16, Lidingö",
+      address: "Kyrkallén 4, Lidingö",
     },
     {
       icon: PartyPopper,
       title: "Fest & Middag",
       time: "ca 16:00",
       location: "Långängens Gård",
-      address: "Långängsvägen 116, Lidingö",
+      address: "Långängens Gård, Lidingö",
     },
   ];
 
