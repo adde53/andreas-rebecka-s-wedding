@@ -16,7 +16,7 @@ const GoodToKnow = () => {
     {
       icon: Camera,
       title: "Fotografering",
-      description: "Under vigseln ber vi er att avstå från egna foton. På festen är det fritt fram att knäppa och ladda upp bilder i vårt galleri!",
+      description: "Under vigseln ber vi er att avstå från egna foton. På festen är det fritt fram att knäppa och ladda upp bilder i vårt galleri.",
     },
     {
       icon: Car,
@@ -31,7 +31,7 @@ const GoodToKnow = () => {
     {
       icon: Heart,
       title: "Tal & Underhållning",
-      description: "Vill du hålla tal eller bidra med underhållning? Kontakta våra toastmasters Vendela (070-053 90 29) eller Lucas (076-818 15 63) senast 30 April",
+      description: "Vill du hålla tal eller bidra med underhållning? Kontakta våra toastmasters Vendela (070-053 90 29) eller Lucas (076-818 15 63) senast 30 April.",
     },
   ];
 
