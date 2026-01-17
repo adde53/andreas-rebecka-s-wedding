@@ -11,7 +11,7 @@ const GoodToKnow = () => {
     {
       icon: Gift,
       title: "Gåvor",
-      description: "Er närvaro är den finaste gåvan! Om ni önskar ge något uppskattar vi bidrag till vår bröllopsresa.",
+      description: "Det finaste är att få dela dagen med er. Vill ni ändå ge en gåva hade vi blivit lika glada för ett bidrag till bröllopsresan som för något vackert och minnesvärt.",
     },
     {
       icon: Camera,
@@ -26,7 +26,7 @@ const GoodToKnow = () => {
     {
       icon: Utensils,
       title: "Mat & Allergier",
-      description: "Meddela eventuella allergier eller specialkost senast 1 maj via OSA.",
+      description: "Meddela eventuella allergier eller specialkost i samband med OSA 31 Mars.",
     },
     {
       icon: Heart,
