@@ -11,12 +11,12 @@ const GoodToKnow = () => {
     {
       icon: Gift,
       title: "Gåvor",
-      description: "Det finaste är att få dela dagen med er. Vill ni ändå ge en gåva hade vi blivit lika glada för ett bidrag till bröllopsresan som för något vackert och minnesvärt.",
+      description: "Det finaste är att få dela dagen med er. Vill ni ändå ge en gåva hade vi blivit lika glada för ett bidrag till vår bröllopsresa som för något vackert och minnesvärt.",
     },
     {
       icon: Camera,
       title: "Fotografering",
-      description: "Under vigseln ber vi er att avstå från egna foton. På festen är det fritt fram att knäppa och ladda upp bilder i vårt galleri.",
+      description: "Under vigseln ber vi er att avstå från att ta egna foton. Vår fotograf Ida kommer fånga detta ögonblick för att ni ska kunna vara med oss i nuet under denna stund. På festen är det fritt fram att knäppa och ladda upp bilder i vårt galleri.",
     },
     {
       icon: Car,
@@ -26,12 +26,12 @@ const GoodToKnow = () => {
     {
       icon: Utensils,
       title: "Mat & Allergier",
-      description: "Meddela eventuella allergier eller specialkost i samband med OSA 31 Mars.",
+      description: "Meddela eventuella allergier eller specialkost i samband med OSA 31 mars.",
     },
     {
       icon: Heart,
       title: "Tal & Underhållning",
-      description: "Vill du hålla tal eller bidra med underhållning? Kontakta våra toastmasters Vendela (070-053 90 29) eller Lucas (076-818 15 63) senast 30 April.",
+      description: "Vill du hålla tal eller bidra med underhållning? Kontakta våra toastmasters \nVendela (070-053 90 29) eller \nLucas (076-818 15 63) senast 30 april.",
     },
   ];
 
@@ -79,7 +79,7 @@ const GoodToKnow = () => {
                 {item.title}
               </h3>
               
-              <p className="text-sm text-muted-foreground font-body leading-relaxed">
+              <p className="text-sm text-muted-foreground font-body leading-relaxed whitespace-pre-line">
                 {item.description}
               </p>
             </motion.div>
