@@ -71,18 +71,24 @@ export type Database = {
           id: string
           updated_at: string
           upload_enabled_from: string | null
+          wedding_end_time: string | null
+          wedding_start_time: string | null
         }
         Insert: {
           created_at?: string
           id?: string
           updated_at?: string
           upload_enabled_from?: string | null
+          wedding_end_time?: string | null
+          wedding_start_time?: string | null
         }
         Update: {
           created_at?: string
           id?: string
           updated_at?: string
           upload_enabled_from?: string | null
+          wedding_end_time?: string | null
+          wedding_start_time?: string | null
         }
         Relationships: []
       }

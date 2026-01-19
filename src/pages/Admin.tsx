@@ -38,6 +38,8 @@ interface Photo {
 interface WeddingSettings {
   id: string;
   upload_enabled_from: string | null;
+  wedding_start_time: string | null;
+  wedding_end_time: string | null;
 }
 
 const Admin = () => {
@@ -45,6 +47,8 @@ const Admin = () => {
   const [settings, setSettings] = useState<WeddingSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploadDate, setUploadDate] = useState<Date | undefined>();
+  const [weddingStartDate, setWeddingStartDate] = useState<Date | undefined>();
+  const [weddingEndDate, setWeddingEndDate] = useState<Date | undefined>();
   const [savingDate, setSavingDate] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const [downloading, setDownloading] = useState(false);
@@ -85,6 +89,12 @@ const Admin = () => {
       
       if (settingsData?.upload_enabled_from) {
         setUploadDate(new Date(settingsData.upload_enabled_from));
+      }
+      if (settingsData?.wedding_start_time) {
+        setWeddingStartDate(new Date(settingsData.wedding_start_time));
+      }
+      if (settingsData?.wedding_end_time) {
+        setWeddingEndDate(new Date(settingsData.wedding_end_time));
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -160,7 +170,7 @@ const Admin = () => {
     }
   };
 
-  const handleSaveUploadDate = async () => {
+  const handleSaveSettings = async () => {
     if (!settings) return;
     
     setSavingDate(true);
@@ -170,6 +180,8 @@ const Admin = () => {
         .from("wedding_settings")
         .update({ 
           upload_enabled_from: uploadDate ? uploadDate.toISOString() : null,
+          wedding_start_time: weddingStartDate ? weddingStartDate.toISOString() : null,
+          wedding_end_time: weddingEndDate ? weddingEndDate.toISOString() : null,
           updated_at: new Date().toISOString()
         })
         .eq("id", settings.id);
@@ -178,9 +190,7 @@ const Admin = () => {
 
       toast({
         title: "Inställningar sparade!",
-        description: uploadDate 
-          ? `Uppladdning aktiveras ${format(uploadDate, "d MMMM yyyy", { locale: sv })}`
-          : "Uppladdning är avstängd",
+        description: "Alla inställningar har sparats",
       });
     } catch (error) {
       console.error("Error saving settings:", error);
@@ -452,13 +462,223 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="settings">
-            <div className="max-w-md">
+            <div className="max-w-2xl space-y-6">
+              {/* Wedding times */}
+              <div className="bg-card p-6 rounded-xl shadow-soft border border-blush/20">
+                <h2 className="text-xl font-serif mb-4 text-foreground">
+                  Bröllopstider
+                </h2>
+                <p className="text-sm text-muted-foreground font-body mb-4">
+                  Ange när bröllopet börjar och slutar.
+                </p>
+
+                <div className="grid gap-6 md:grid-cols-2">
+                  {/* Wedding start time */}
+                  <div className="space-y-4">
+                    <h3 className="text-md font-body font-medium text-foreground">Starttid</h3>
+                    <div className="space-y-2">
+                      <label className="text-sm font-body text-foreground">Datum</label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !weddingStartDate && "text-muted-foreground"
+                            )}
+                          >
+                            <Calendar className="mr-2 h-4 w-4" />
+                            {weddingStartDate ? (
+                              format(weddingStartDate, "d MMMM yyyy", { locale: sv })
+                            ) : (
+                              "Välj datum"
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarComponent
+                            mode="single"
+                            selected={weddingStartDate}
+                            onSelect={(date) => {
+                              if (date) {
+                                const hours = weddingStartDate?.getHours() ?? 14;
+                                const minutes = weddingStartDate?.getMinutes() ?? 0;
+                                date.setHours(hours, minutes, 0, 0);
+                              }
+                              setWeddingStartDate(date);
+                            }}
+                            initialFocus
+                            className="pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    {weddingStartDate && (
+                      <div className="space-y-2">
+                        <label className="text-sm font-body text-foreground">Tid</label>
+                        <div className="flex gap-2">
+                          <select
+                            value={weddingStartDate.getHours()}
+                            onChange={(e) => {
+                              const newDate = new Date(weddingStartDate);
+                              newDate.setHours(parseInt(e.target.value));
+                              setWeddingStartDate(newDate);
+                            }}
+                            className="flex-1 h-10 px-3 rounded-md border border-input bg-background text-sm"
+                          >
+                            {Array.from({ length: 24 }, (_, i) => (
+                              <option key={i} value={i}>
+                                {i.toString().padStart(2, "0")}
+                              </option>
+                            ))}
+                          </select>
+                          <span className="flex items-center text-muted-foreground">:</span>
+                          <select
+                            value={weddingStartDate.getMinutes()}
+                            onChange={(e) => {
+                              const newDate = new Date(weddingStartDate);
+                              newDate.setMinutes(parseInt(e.target.value));
+                              setWeddingStartDate(newDate);
+                            }}
+                            className="flex-1 h-10 px-3 rounded-md border border-input bg-background text-sm"
+                          >
+                            {Array.from({ length: 60 }, (_, i) => (
+                              <option key={i} value={i}>
+                                {i.toString().padStart(2, "0")}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                    )}
+
+                    {weddingStartDate && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setWeddingStartDate(undefined)}
+                      >
+                        Rensa starttid
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Wedding end time */}
+                  <div className="space-y-4">
+                    <h3 className="text-md font-body font-medium text-foreground">Sluttid</h3>
+                    <div className="space-y-2">
+                      <label className="text-sm font-body text-foreground">Datum</label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !weddingEndDate && "text-muted-foreground"
+                            )}
+                          >
+                            <Calendar className="mr-2 h-4 w-4" />
+                            {weddingEndDate ? (
+                              format(weddingEndDate, "d MMMM yyyy", { locale: sv })
+                            ) : (
+                              "Välj datum"
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarComponent
+                            mode="single"
+                            selected={weddingEndDate}
+                            onSelect={(date) => {
+                              if (date) {
+                                const hours = weddingEndDate?.getHours() ?? 23;
+                                const minutes = weddingEndDate?.getMinutes() ?? 0;
+                                date.setHours(hours, minutes, 0, 0);
+                              }
+                              setWeddingEndDate(date);
+                            }}
+                            initialFocus
+                            className="pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    {weddingEndDate && (
+                      <div className="space-y-2">
+                        <label className="text-sm font-body text-foreground">Tid</label>
+                        <div className="flex gap-2">
+                          <select
+                            value={weddingEndDate.getHours()}
+                            onChange={(e) => {
+                              const newDate = new Date(weddingEndDate);
+                              newDate.setHours(parseInt(e.target.value));
+                              setWeddingEndDate(newDate);
+                            }}
+                            className="flex-1 h-10 px-3 rounded-md border border-input bg-background text-sm"
+                          >
+                            {Array.from({ length: 24 }, (_, i) => (
+                              <option key={i} value={i}>
+                                {i.toString().padStart(2, "0")}
+                              </option>
+                            ))}
+                          </select>
+                          <span className="flex items-center text-muted-foreground">:</span>
+                          <select
+                            value={weddingEndDate.getMinutes()}
+                            onChange={(e) => {
+                              const newDate = new Date(weddingEndDate);
+                              newDate.setMinutes(parseInt(e.target.value));
+                              setWeddingEndDate(newDate);
+                            }}
+                            className="flex-1 h-10 px-3 rounded-md border border-input bg-background text-sm"
+                          >
+                            {Array.from({ length: 60 }, (_, i) => (
+                              <option key={i} value={i}>
+                                {i.toString().padStart(2, "0")}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                    )}
+
+                    {weddingEndDate && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setWeddingEndDate(undefined)}
+                      >
+                        Rensa sluttid
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Summary */}
+                {(weddingStartDate || weddingEndDate) && (
+                  <div className="mt-4 p-3 bg-muted/50 rounded-md">
+                    <p className="text-sm text-foreground font-body">
+                      {weddingStartDate && (
+                        <span>Bröllopet börjar: {format(weddingStartDate, "d MMMM yyyy 'kl' HH:mm", { locale: sv })}</span>
+                      )}
+                      {weddingStartDate && weddingEndDate && <br />}
+                      {weddingEndDate && (
+                        <span>Bröllopet slutar: {format(weddingEndDate, "d MMMM yyyy 'kl' HH:mm", { locale: sv })}</span>
+                      )}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Upload settings */}
               <div className="bg-card p-6 rounded-xl shadow-soft border border-blush/20">
                 <h2 className="text-xl font-serif mb-4 text-foreground">
                   Uppladdning av bilder
                 </h2>
                 <p className="text-sm text-muted-foreground font-body mb-4">
-                  Gäster kan bara ladda upp bilder från och med det valda datumet och tiden.
+                  Gäster kan ladda upp bilder från och med det valda datumet och tiden. Detta är oberoende av bröllopstiderna.
                 </p>
 
                 <div className="space-y-4">
@@ -487,7 +707,6 @@ const Admin = () => {
                           selected={uploadDate}
                           onSelect={(date) => {
                             if (date) {
-                              // Preserve the time from existing uploadDate
                               const hours = uploadDate?.getHours() ?? 12;
                               const minutes = uploadDate?.getMinutes() ?? 0;
                               date.setHours(hours, minutes, 0, 0);
@@ -540,33 +759,35 @@ const Admin = () => {
                     </div>
                   )}
 
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={handleSaveUploadDate}
-                      disabled={savingDate}
-                      className="flex-1"
-                    >
-                      {savingDate ? (
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      ) : null}
-                      Spara
-                    </Button>
-                    {uploadDate && (
+                  {uploadDate && (
+                    <>
+                      <p className="text-sm text-primary font-body">
+                        ✓ Uppladdning aktiveras {format(uploadDate, "d MMMM yyyy 'kl' HH:mm", { locale: sv })}
+                      </p>
                       <Button
-                        variant="outline"
+                        variant="ghost"
+                        size="sm"
                         onClick={() => setUploadDate(undefined)}
                       >
-                        Rensa
+                        Rensa uppladdningstid
                       </Button>
-                    )}
-                  </div>
-
-                  {uploadDate && (
-                    <p className="text-sm text-primary font-body">
-                      ✓ Uppladdning aktiveras {format(uploadDate, "d MMMM yyyy 'kl' HH:mm", { locale: sv })}
-                    </p>
+                    </>
                   )}
                 </div>
+              </div>
+
+              {/* Save button */}
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleSaveSettings}
+                  disabled={savingDate}
+                  className="flex-1"
+                >
+                  {savingDate ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : null}
+                  Spara alla inställningar
+                </Button>
               </div>
             </div>
           </TabsContent>
