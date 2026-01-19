@@ -18,7 +18,7 @@ const Index = () => {
       try {
         const { data, error } = await supabase
           .from("wedding_settings")
-          .select("upload_enabled_from")
+          .select("wedding_end_time")
           .limit(1)
           .maybeSingle();
 
@@ -28,9 +28,9 @@ const Index = () => {
           return;
         }
 
-        if (data?.upload_enabled_from) {
-          const enabledFromDate = new Date(data.upload_enabled_from);
-          setShowPostWedding(new Date() >= enabledFromDate);
+        if (data?.wedding_end_time) {
+          const endDate = new Date(data.wedding_end_time);
+          setShowPostWedding(new Date() >= endDate);
         } else {
           setShowPostWedding(false);
         }
