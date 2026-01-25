@@ -130,41 +130,41 @@ const PhotoGallery = () => {
   };
 
   return (
-    <section className="py-24 bg-gradient-to-b from-soft-pink/20 via-blush/10 to-background relative overflow-hidden" id="gallery">
+    <section className="py-16 sm:py-24 bg-gradient-to-b from-soft-pink/20 via-blush/10 to-background relative overflow-hidden" id="gallery">
       {/* Decorative background elements */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-dusty-rose/10 to-transparent" />
-        <div className="absolute top-20 left-10 w-64 h-64 rounded-full bg-blush/20 blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-soft-pink/20 blur-3xl" />
-        <div className="absolute top-1/3 right-1/4 w-48 h-48 rounded-full bg-dusty-rose/15 blur-3xl" />
+        <div className="absolute top-0 left-0 w-full h-24 sm:h-32 bg-gradient-to-b from-dusty-rose/10 to-transparent" />
+        <div className="absolute top-10 sm:top-20 left-4 sm:left-10 w-40 sm:w-64 h-40 sm:h-64 rounded-full bg-blush/20 blur-3xl" />
+        <div className="absolute bottom-10 sm:bottom-20 right-4 sm:right-10 w-48 sm:w-80 h-48 sm:h-80 rounded-full bg-soft-pink/20 blur-3xl" />
+        <div className="absolute top-1/3 right-1/4 w-32 sm:w-48 h-32 sm:h-48 rounded-full bg-dusty-rose/15 blur-3xl" />
       </div>
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-16"
         >
           <motion.div
             initial={{ scale: 0, rotate: -10 }}
             whileInView={{ scale: 1, rotate: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, type: "spring" }}
-            className="w-20 h-20 mx-auto mb-8 rounded-full bg-gradient-to-br from-blush via-soft-pink to-dusty-rose/50 flex items-center justify-center shadow-lg"
+            className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-6 sm:mb-8 rounded-full bg-gradient-to-br from-blush via-soft-pink to-dusty-rose/50 flex items-center justify-center shadow-lg"
           >
-            <Camera className="w-9 h-9 text-foreground/80" />
+            <Camera className="w-7 h-7 sm:w-9 sm:h-9 text-foreground/80" />
           </motion.div>
-          <h2 className="text-4xl md:text-6xl font-serif font-light text-foreground mb-4 tracking-wide">
+          <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif font-light text-foreground mb-3 sm:mb-4 tracking-wide">
             Fotogalleri
           </h2>
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <div className="w-16 h-px bg-gradient-to-r from-transparent to-dusty-rose/60" />
-            <div className="w-2 h-2 rounded-full bg-dusty-rose/60" />
-            <div className="w-16 h-px bg-gradient-to-l from-transparent to-dusty-rose/60" />
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+            <div className="w-12 sm:w-16 h-px bg-gradient-to-r from-transparent to-dusty-rose/60" />
+            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-dusty-rose/60" />
+            <div className="w-12 sm:w-16 h-px bg-gradient-to-l from-transparent to-dusty-rose/60" />
           </div>
-          <p className="text-muted-foreground font-body max-w-lg mx-auto text-lg leading-relaxed">
+          <p className="text-sm sm:text-lg text-muted-foreground font-body max-w-lg mx-auto leading-relaxed px-2">
             Dela dina minnen från festen med oss
           </p>
         </motion.div>
@@ -268,7 +268,7 @@ const PhotoGallery = () => {
             </p>
           </motion.div>
         ) : (
-          <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+          <div className="columns-2 md:columns-3 lg:columns-4 gap-2 sm:gap-4 space-y-2 sm:space-y-4">
             {photos.map((photo, index) => (
               <motion.div
                 key={photo.id}
