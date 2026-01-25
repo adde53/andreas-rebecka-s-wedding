@@ -20,28 +20,28 @@ const WeddingDetails = () => {
   ];
 
   return (
-    <section className="py-24 bg-secondary relative overflow-hidden">
+    <section className="py-16 sm:py-24 bg-secondary relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-        <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-blush/30 blur-3xl" />
-        <div className="absolute bottom-10 right-10 w-40 h-40 rounded-full bg-sage-light/40 blur-3xl" />
+        <div className="absolute top-10 left-4 sm:left-10 w-24 sm:w-32 h-24 sm:h-32 rounded-full bg-blush/30 blur-3xl" />
+        <div className="absolute bottom-10 right-4 sm:right-10 w-32 sm:w-40 h-32 sm:h-40 rounded-full bg-sage-light/40 blur-3xl" />
       </div>
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-serif font-light text-foreground mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-light text-foreground mb-3 sm:mb-4">
             Dagen
           </h2>
-          <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent mx-auto" />
+          <div className="w-20 sm:w-24 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent mx-auto" />
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid sm:grid-cols-2 gap-4 sm:gap-8 max-w-4xl mx-auto">
           {details.map((detail, index) => (
             <motion.div
               key={detail.title}
@@ -49,30 +49,30 @@ const WeddingDetails = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.2 }}
-              className="bg-gradient-card p-8 rounded-xl shadow-card text-center border border-blush/20 hover:shadow-lg transition-shadow duration-300"
+              className="bg-gradient-card p-5 sm:p-8 rounded-xl shadow-card text-center border border-blush/20 hover:shadow-lg transition-shadow duration-300"
             >
               <motion.div 
-                className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-accent to-blush/30 flex items-center justify-center"
+                className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 rounded-full bg-gradient-to-br from-accent to-blush/30 flex items-center justify-center"
                 whileHover={{ scale: 1.05 }}
               >
-                <detail.icon className="w-8 h-8 text-primary" />
+                <detail.icon className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
               </motion.div>
               
-              <h3 className="text-2xl font-serif mb-4 text-foreground">
+              <h3 className="text-xl sm:text-2xl font-serif mb-3 sm:mb-4 text-foreground">
                 {detail.title}
               </h3>
               
               <div className="flex items-center justify-center gap-2 text-muted-foreground mb-2">
                 <Clock className="w-4 h-4 text-primary/70" />
-                <span className="font-body font-medium">{detail.time}</span>
+                <span className="font-body font-medium text-sm sm:text-base">{detail.time}</span>
               </div>
               
               <div className="flex items-center justify-center gap-2 text-muted-foreground mb-1">
                 <MapPin className="w-4 h-4 text-primary/70" />
-                <span className="font-body font-medium">{detail.location}</span>
+                <span className="font-body font-medium text-sm sm:text-base">{detail.location}</span>
               </div>
               
-              <p className="text-sm text-muted-foreground font-body">
+              <p className="text-xs sm:text-sm text-muted-foreground font-body">
                 {detail.address}
               </p>
             </motion.div>

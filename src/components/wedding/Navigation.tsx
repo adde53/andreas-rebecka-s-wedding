@@ -43,9 +43,9 @@ const Navigation = () => {
           : "bg-transparent"
       }`}
     >
-      <div className="container mx-auto px-6">
-        <div className="flex items-center justify-between h-16">
-          <a href="#" className="font-serif text-xl text-foreground">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="flex items-center justify-between h-14 sm:h-16">
+          <a href="#" className="font-serif text-lg sm:text-xl text-foreground">
             A & R
           </a>
 
@@ -64,8 +64,9 @@ const Navigation = () => {
 
           {/* Mobile menu button */}
           <button
-            className="md:hidden p-2 text-foreground"
+            className="md:hidden p-2 -mr-2 text-foreground touch-manipulation"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Meny"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -81,12 +82,12 @@ const Navigation = () => {
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden bg-background/95 backdrop-blur-md border-t border-border"
           >
-            <div className="container mx-auto px-6 py-4 space-y-3">
+            <div className="container mx-auto px-4 py-2 space-y-1">
               {navItems.map((item) => (
                 <button
                   key={item.label}
                   onClick={() => scrollToSection(item.href)}
-                  className="block w-full text-left font-body text-muted-foreground hover:text-foreground transition-colors py-2"
+                  className="block w-full text-left font-body text-muted-foreground hover:text-foreground active:bg-accent/50 transition-colors py-3 px-2 rounded-lg touch-manipulation"
                 >
                   {item.label}
                 </button>

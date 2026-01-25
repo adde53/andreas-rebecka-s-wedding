@@ -95,23 +95,23 @@ const HeroSection = () => {
       <div className="absolute top-20 left-1/2 -translate-x-1/2 w-px h-24 bg-gradient-to-b from-transparent via-primary/40 to-transparent" />
       <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-px h-24 bg-gradient-to-b from-transparent via-primary/40 to-transparent" />
 
-      <div className="container mx-auto px-6 text-center relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 text-center relative z-10 pt-14 sm:pt-16">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: "easeOut" }}
         >
           <motion.p 
-            className="text-sm tracking-[0.3em] uppercase text-muted-foreground mb-6 font-body"
+            className="text-xs sm:text-sm tracking-[0.2em] sm:tracking-[0.3em] uppercase text-muted-foreground mb-4 sm:mb-6 font-body"
             initial={{ opacity: 0, letterSpacing: "0.5em" }}
-            animate={{ opacity: 1, letterSpacing: "0.3em" }}
+            animate={{ opacity: 1, letterSpacing: "0.2em" }}
             transition={{ duration: 1.5, delay: 0.2 }}
           >
             Vi gifter oss
           </motion.p>
           
           <motion.h1 
-            className="text-5xl md:text-7xl lg:text-8xl font-serif font-light text-foreground mb-4"
+            className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-serif font-light text-foreground mb-2 sm:mb-4"
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
@@ -120,14 +120,14 @@ const HeroSection = () => {
           </motion.h1>
           
           <motion.div 
-            className="flex items-center justify-center gap-4 my-6"
+            className="flex items-center justify-center gap-3 sm:gap-4 my-4 sm:my-6"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.5, delay: 0.6 }}
           >
-            <div className="w-16 md:w-24 h-px bg-gradient-to-r from-transparent via-primary/60 to-primary/60" />
+            <div className="w-12 sm:w-16 md:w-24 h-px bg-gradient-to-r from-transparent via-primary/60 to-primary/60" />
             <motion.span 
-              className="text-3xl text-primary font-serif"
+              className="text-2xl sm:text-3xl text-primary font-serif"
               animate={{ 
                 scale: [1, 1.1, 1],
               }}
@@ -135,11 +135,11 @@ const HeroSection = () => {
             >
               &
             </motion.span>
-            <div className="w-16 md:w-24 h-px bg-gradient-to-l from-transparent via-primary/60 to-primary/60" />
+            <div className="w-12 sm:w-16 md:w-24 h-px bg-gradient-to-l from-transparent via-primary/60 to-primary/60" />
           </motion.div>
           
           <motion.h1 
-            className="text-5xl md:text-7xl lg:text-8xl font-serif font-light text-foreground mb-6"
+            className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-serif font-light text-foreground mb-4 sm:mb-6"
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -148,7 +148,7 @@ const HeroSection = () => {
           </motion.h1>
 
           <motion.p
-            className="text-lg md:text-xl font-serif text-primary/80 tracking-wide mb-8"
+            className="text-base sm:text-lg md:text-xl font-serif text-primary/80 tracking-wide mb-6 sm:mb-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 1 }}
@@ -160,16 +160,16 @@ const HeroSection = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1, duration: 1 }}
-            className="space-y-3"
+            className="space-y-2 sm:space-y-3"
           >
-            <div className="flex items-center justify-center gap-3">
-              <div className="w-8 h-px bg-sage/40" />
-              <p className="text-xl md:text-2xl font-serif text-muted-foreground">
+            <div className="flex items-center justify-center gap-2 sm:gap-3">
+              <div className="w-6 sm:w-8 h-px bg-sage/40" />
+              <p className="text-lg sm:text-xl md:text-2xl font-serif text-muted-foreground">
                 30 maj 2026
               </p>
-              <div className="w-8 h-px bg-sage/40" />
+              <div className="w-6 sm:w-8 h-px bg-sage/40" />
             </div>
-            <p className="text-base text-muted-foreground font-body">
+            <p className="text-sm sm:text-base text-muted-foreground font-body">
               Lidingö, Stockholm
             </p>
           </motion.div>
