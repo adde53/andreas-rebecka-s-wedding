@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Gift, Shirt, Camera, Car, Heart, Utensils } from "lucide-react";
+import swishQr from "@/assets/swish-qr.png";
 
 const GoodToKnow = () => {
   const items = [
@@ -85,6 +86,44 @@ const GoodToKnow = () => {
             </motion.div>
           ))}
         </div>
+
+        {/* Swish Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="mt-8 sm:mt-12 max-w-lg mx-auto"
+        >
+          <div className="bg-gradient-card p-6 sm:p-8 rounded-xl shadow-card border border-blush/20 text-center">
+            <motion.div 
+              className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-4 rounded-full bg-gradient-to-br from-accent to-blush/40 flex items-center justify-center"
+              whileHover={{ rotate: 5, scale: 1.05 }}
+            >
+              <Gift className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+            </motion.div>
+            
+            <h3 className="text-xl sm:text-2xl font-serif mb-2 text-foreground">
+              Bidra till bröllopsresan
+            </h3>
+            
+            <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed mb-5">
+              Vill ni ge ett bidrag till vår bröllopsresa? Swisha till <span className="font-medium text-foreground">Lucas Olsson</span> via QR-koden nedan. 
+              Skriv gärna ert namn i meddelandet så att vi kan tacka er personligen!
+            </p>
+            <p className="text-xs text-muted-foreground/80 font-body mb-5">
+              Efter bröllopet kommer Lucas att sammanställa alla bidrag med belopp, avsändare och meddelanden.
+            </p>
+
+            <div className="inline-block rounded-xl overflow-hidden shadow-soft">
+              <img 
+                src={swishQr} 
+                alt="Swish QR-kod till Lucas Olsson för bröllopsresa" 
+                className="w-48 sm:w-56 h-auto"
+              />
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
