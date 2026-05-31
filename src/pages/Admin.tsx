@@ -852,10 +852,46 @@ const Admin = () => {
               <img
                 src={getImageUrl(selectedPhoto.file_path)}
                 alt={selectedPhoto.file_name}
-                className="w-full h-auto max-h-[80vh] object-contain"
+                className="w-full h-auto max-h-[80vh] object-contain bg-black"
               />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                <div className="flex items-center justify-between">
+
+              {/* Prev / next navigation */}
+              {selectedIndex > 0 && (
+                <button
+                  onClick={() => goToPhoto(-1)}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/40 hover:bg-black/60 text-white transition-colors"
+                  aria-label="Föregående bild"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+              )}
+              {selectedIndex >= 0 && selectedIndex < orderedPhotos.length - 1 && (
+                <button
+                  onClick={() => goToPhoto(1)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/40 hover:bg-black/60 text-white transition-colors"
+                  aria-label="Nästa bild"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+              )}
+
+              {/* Counter + approval badge */}
+              <div className="absolute top-2 left-2 flex gap-2">
+                <span className="bg-black/50 text-white text-xs px-2 py-1 rounded-full font-body">
+                  {selectedIndex + 1} / {orderedPhotos.length}
+                </span>
+                <span className={cn(
+                  "text-xs px-2 py-1 rounded-full font-body",
+                  selectedPhoto.approved
+                    ? "bg-primary/80 text-primary-foreground"
+                    : "bg-yellow-500/80 text-white"
+                )}>
+                  {selectedPhoto.approved ? "Godkänd" : "Väntar"}
+                </span>
+              </div>
+
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                <div className="flex items-end justify-between gap-3 flex-wrap">
                   <div>
                     <p className="text-white font-body text-sm">
                       {selectedPhoto.uploaded_by || "Okänd"}
@@ -864,7 +900,7 @@ const Admin = () => {
                       {format(new Date(selectedPhoto.created_at), "d MMMM yyyy 'kl' HH:mm", { locale: sv })}
                     </p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <Button
                       size="sm"
                       variant="secondary"
@@ -876,10 +912,7 @@ const Admin = () => {
                     {!selectedPhoto.approved ? (
                       <Button
                         size="sm"
-                        onClick={() => {
-                          handleApprove(selectedPhoto.id, true);
-                          setSelectedPhoto(null);
-                        }}
+                        onClick={() => handleApprove(selectedPhoto.id, true)}
                       >
                         <Check className="w-4 h-4 mr-2" />
                         Godkänn
@@ -888,20 +921,29 @@ const Admin = () => {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => {
-                          handleApprove(selectedPhoto.id, false);
-                          setSelectedPhoto(null);
-                        }}
+                        onClick={() => handleApprove(selectedPhoto.id, false)}
                       >
                         <X className="w-4 h-4 mr-2" />
                         Neka
                       </Button>
                     )}
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => {
+                        handleDelete(selectedPhoto.id, selectedPhoto.file_path);
+                        setSelectedPhoto(null);
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Ta bort
+                    </Button>
                   </div>
                 </div>
               </div>
             </div>
           )}
+
         </DialogContent>
       </Dialog>
     </div>
