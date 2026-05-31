@@ -223,23 +223,33 @@ const Admin = () => {
   const handleDownloadAll = async () => {
     setDownloading(true);
     try {
+      const zip = new JSZip();
+      const used = new Set<string>();
       for (const photo of photos) {
         const url = getImageUrl(photo.file_path);
         const response = await fetch(url);
         const blob = await response.blob();
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = photo.file_name;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-        // Small delay between downloads
-        await new Promise(resolve => setTimeout(resolve, 300));
+        let name = photo.file_name;
+        if (used.has(name)) {
+          const dot = name.lastIndexOf(".");
+          const base = dot > 0 ? name.slice(0, dot) : name;
+          const ext = dot > 0 ? name.slice(dot) : "";
+          name = `${base}-${photo.id.slice(0, 6)}${ext}`;
+        }
+        used.add(name);
+        zip.file(name, blob);
       }
+      const content = await zip.generateAsync({ type: "blob" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(content);
+      link.download = `brollopsbilder-${new Date().toISOString().slice(0, 10)}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
       toast({
         title: "Nedladdning klar!",
-        description: `${photos.length} bilder har laddats ner`,
+        description: `${photos.length} bilder paketerade i en ZIP-fil`,
       });
     } catch (error) {
       console.error("Error downloading photos:", error);
@@ -252,6 +262,7 @@ const Admin = () => {
       setDownloading(false);
     }
   };
+
 
   const handleDownloadSingle = async (photo: Photo) => {
     try {
