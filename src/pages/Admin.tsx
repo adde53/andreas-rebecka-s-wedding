@@ -289,6 +289,37 @@ const Admin = () => {
   const pendingPhotos = photos.filter(p => !p.approved);
   const approvedPhotos = photos.filter(p => p.approved);
 
+  // Ordered list used for prev/next navigation in preview: pending first, then approved
+  const orderedPhotos = [...pendingPhotos, ...approvedPhotos];
+  const selectedIndex = selectedPhoto
+    ? orderedPhotos.findIndex(p => p.id === selectedPhoto.id)
+    : -1;
+
+  const goToPhoto = useCallback((delta: number) => {
+    if (selectedIndex < 0) return;
+    const next = orderedPhotos[selectedIndex + delta];
+    if (next) setSelectedPhoto(next);
+  }, [selectedIndex, orderedPhotos]);
+
+  useEffect(() => {
+    if (!selectedPhoto) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") goToPhoto(-1);
+      else if (e.key === "ArrowRight") goToPhoto(1);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [selectedPhoto, goToPhoto]);
+
+  // Keep selected photo in sync if its approval changes
+  useEffect(() => {
+    if (!selectedPhoto) return;
+    const updated = photos.find(p => p.id === selectedPhoto.id);
+    if (updated && updated.approved !== selectedPhoto.approved) {
+      setSelectedPhoto(updated);
+    }
+  }, [photos, selectedPhoto]);
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -296,6 +327,7 @@ const Admin = () => {
       </div>
     );
   }
+
 
   return (
     <div className="min-h-screen bg-background">
