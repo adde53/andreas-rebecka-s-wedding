@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { sv } from "date-fns/locale";
+import JSZip from "jszip";
 import { 
   Check, 
   X, 
@@ -13,8 +14,11 @@ import {
   Image as ImageIcon,
   Settings,
   Download,
-  Eye
+  Eye,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -219,23 +223,33 @@ const Admin = () => {
   const handleDownloadAll = async () => {
     setDownloading(true);
     try {
+      const zip = new JSZip();
+      const used = new Set<string>();
       for (const photo of photos) {
         const url = getImageUrl(photo.file_path);
         const response = await fetch(url);
         const blob = await response.blob();
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = photo.file_name;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-        // Small delay between downloads
-        await new Promise(resolve => setTimeout(resolve, 300));
+        let name = photo.file_name;
+        if (used.has(name)) {
+          const dot = name.lastIndexOf(".");
+          const base = dot > 0 ? name.slice(0, dot) : name;
+          const ext = dot > 0 ? name.slice(dot) : "";
+          name = `${base}-${photo.id.slice(0, 6)}${ext}`;
+        }
+        used.add(name);
+        zip.file(name, blob);
       }
+      const content = await zip.generateAsync({ type: "blob" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(content);
+      link.download = `brollopsbilder-${new Date().toISOString().slice(0, 10)}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
       toast({
         title: "Nedladdning klar!",
-        description: `${photos.length} bilder har laddats ner`,
+        description: `${photos.length} bilder paketerade i en ZIP-fil`,
       });
     } catch (error) {
       console.error("Error downloading photos:", error);
@@ -248,6 +262,7 @@ const Admin = () => {
       setDownloading(false);
     }
   };
+
 
   const handleDownloadSingle = async (photo: Photo) => {
     try {
@@ -274,6 +289,37 @@ const Admin = () => {
   const pendingPhotos = photos.filter(p => !p.approved);
   const approvedPhotos = photos.filter(p => p.approved);
 
+  // Ordered list used for prev/next navigation in preview: pending first, then approved
+  const orderedPhotos = [...pendingPhotos, ...approvedPhotos];
+  const selectedIndex = selectedPhoto
+    ? orderedPhotos.findIndex(p => p.id === selectedPhoto.id)
+    : -1;
+
+  const goToPhoto = useCallback((delta: number) => {
+    if (selectedIndex < 0) return;
+    const next = orderedPhotos[selectedIndex + delta];
+    if (next) setSelectedPhoto(next);
+  }, [selectedIndex, orderedPhotos]);
+
+  useEffect(() => {
+    if (!selectedPhoto) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") goToPhoto(-1);
+      else if (e.key === "ArrowRight") goToPhoto(1);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [selectedPhoto, goToPhoto]);
+
+  // Keep selected photo in sync if its approval changes
+  useEffect(() => {
+    if (!selectedPhoto) return;
+    const updated = photos.find(p => p.id === selectedPhoto.id);
+    if (updated && updated.approved !== selectedPhoto.approved) {
+      setSelectedPhoto(updated);
+    }
+  }, [photos, selectedPhoto]);
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -281,6 +327,7 @@ const Admin = () => {
       </div>
     );
   }
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -805,10 +852,46 @@ const Admin = () => {
               <img
                 src={getImageUrl(selectedPhoto.file_path)}
                 alt={selectedPhoto.file_name}
-                className="w-full h-auto max-h-[80vh] object-contain"
+                className="w-full h-auto max-h-[80vh] object-contain bg-black"
               />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                <div className="flex items-center justify-between">
+
+              {/* Prev / next navigation */}
+              {selectedIndex > 0 && (
+                <button
+                  onClick={() => goToPhoto(-1)}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/40 hover:bg-black/60 text-white transition-colors"
+                  aria-label="Föregående bild"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+              )}
+              {selectedIndex >= 0 && selectedIndex < orderedPhotos.length - 1 && (
+                <button
+                  onClick={() => goToPhoto(1)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/40 hover:bg-black/60 text-white transition-colors"
+                  aria-label="Nästa bild"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+              )}
+
+              {/* Counter + approval badge */}
+              <div className="absolute top-2 left-2 flex gap-2">
+                <span className="bg-black/50 text-white text-xs px-2 py-1 rounded-full font-body">
+                  {selectedIndex + 1} / {orderedPhotos.length}
+                </span>
+                <span className={cn(
+                  "text-xs px-2 py-1 rounded-full font-body",
+                  selectedPhoto.approved
+                    ? "bg-primary/80 text-primary-foreground"
+                    : "bg-yellow-500/80 text-white"
+                )}>
+                  {selectedPhoto.approved ? "Godkänd" : "Väntar"}
+                </span>
+              </div>
+
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                <div className="flex items-end justify-between gap-3 flex-wrap">
                   <div>
                     <p className="text-white font-body text-sm">
                       {selectedPhoto.uploaded_by || "Okänd"}
@@ -817,7 +900,7 @@ const Admin = () => {
                       {format(new Date(selectedPhoto.created_at), "d MMMM yyyy 'kl' HH:mm", { locale: sv })}
                     </p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <Button
                       size="sm"
                       variant="secondary"
@@ -829,10 +912,7 @@ const Admin = () => {
                     {!selectedPhoto.approved ? (
                       <Button
                         size="sm"
-                        onClick={() => {
-                          handleApprove(selectedPhoto.id, true);
-                          setSelectedPhoto(null);
-                        }}
+                        onClick={() => handleApprove(selectedPhoto.id, true)}
                       >
                         <Check className="w-4 h-4 mr-2" />
                         Godkänn
@@ -841,20 +921,29 @@ const Admin = () => {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => {
-                          handleApprove(selectedPhoto.id, false);
-                          setSelectedPhoto(null);
-                        }}
+                        onClick={() => handleApprove(selectedPhoto.id, false)}
                       >
                         <X className="w-4 h-4 mr-2" />
                         Neka
                       </Button>
                     )}
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => {
+                        handleDelete(selectedPhoto.id, selectedPhoto.file_path);
+                        setSelectedPhoto(null);
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Ta bort
+                    </Button>
                   </div>
                 </div>
               </div>
             </div>
           )}
+
         </DialogContent>
       </Dialog>
     </div>
