@@ -117,17 +117,17 @@ const Admin = () => {
     try {
       const { error } = await supabase
         .from("photos")
-        .update({ approved })
+        .update({ approved, rejected: false })
         .eq("id", photoId);
 
       if (error) throw error;
 
       setPhotos(photos.map(p => 
-        p.id === photoId ? { ...p, approved } : p
+        p.id === photoId ? { ...p, approved, rejected: false } : p
       ));
 
       toast({
-        title: approved ? "Bild godkänd!" : "Bild nekad",
+        title: approved ? "Bild godkänd!" : "Bild flyttad till väntelistan",
         description: approved 
           ? "Bilden visas nu i galleriet" 
           : "Bilden är dold från galleriet",
@@ -137,6 +137,33 @@ const Admin = () => {
       toast({
         title: "Fel",
         description: "Kunde inte uppdatera bilden",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleReject = async (photoId: string) => {
+    try {
+      const { error } = await supabase
+        .from("photos")
+        .update({ approved: false, rejected: true })
+        .eq("id", photoId);
+
+      if (error) throw error;
+
+      setPhotos(photos.map(p =>
+        p.id === photoId ? { ...p, approved: false, rejected: true } : p
+      ));
+
+      toast({
+        title: "Bild nekad",
+        description: "Bilden flyttades till nekade bilder och kan godkännas senare",
+      });
+    } catch (error) {
+      console.error("Error rejecting photo:", error);
+      toast({
+        title: "Fel",
+        description: "Kunde inte neka bilden",
         variant: "destructive",
       });
     }
