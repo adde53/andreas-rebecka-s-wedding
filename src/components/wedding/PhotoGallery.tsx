@@ -129,6 +129,9 @@ const PhotoGallery = () => {
     return data.publicUrl;
   };
 
+  const isVideo = (fileName: string) =>
+    /\.(mp4|mov|webm|m4v|3gp|3gpp|quicktime)$/i.test(fileName);
+
   return (
     <section className="py-16 sm:py-24 bg-gradient-to-b from-soft-pink/20 via-blush/10 to-background relative overflow-hidden" id="gallery">
       {/* Decorative background elements */}
