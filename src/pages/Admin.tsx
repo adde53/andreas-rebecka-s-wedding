@@ -37,6 +37,7 @@ interface Photo {
   caption: string | null;
   created_at: string;
   approved: boolean;
+  rejected: boolean;
 }
 
 interface WeddingSettings {
