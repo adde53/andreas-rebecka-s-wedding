@@ -314,11 +314,12 @@ const Admin = () => {
     }
   };
 
-  const pendingPhotos = photos.filter(p => !p.approved);
+  const pendingPhotos = photos.filter(p => !p.approved && !p.rejected);
+  const rejectedPhotos = photos.filter(p => p.rejected);
   const approvedPhotos = photos.filter(p => p.approved);
 
-  // Ordered list used for prev/next navigation in preview: pending first, then approved
-  const orderedPhotos = [...pendingPhotos, ...approvedPhotos];
+  // Ordered list used for prev/next navigation in preview: pending → rejected → approved
+  const orderedPhotos = [...pendingPhotos, ...rejectedPhotos, ...approvedPhotos];
   const selectedIndex = selectedPhoto
     ? orderedPhotos.findIndex(p => p.id === selectedPhoto.id)
     : -1;
