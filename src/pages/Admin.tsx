@@ -248,6 +248,33 @@ const Admin = () => {
     return data.publicUrl;
   };
 
+  const isVideo = (fileName: string) =>
+    /\.(mp4|mov|webm|m4v|3gp|3gpp|quicktime)$/i.test(fileName);
+
+  const MediaThumb = ({ photo }: { photo: Photo }) =>
+    isVideo(photo.file_name) ? (
+      <div className="relative w-full h-full">
+        <video
+          src={getImageUrl(photo.file_path)}
+          className="w-full h-full object-cover"
+          muted
+          playsInline
+          preload="metadata"
+        />
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-10 h-10 rounded-full bg-black/50 flex items-center justify-center">
+            <svg className="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+      </div>
+    ) : (
+      <img
+        src={getImageUrl(photo.file_path)}
+        alt={photo.file_name}
+        className="w-full h-full object-cover"
+      />
+    );
+
   const handleDownloadAll = async () => {
     setDownloading(true);
     try {
@@ -436,11 +463,7 @@ const Admin = () => {
                         className="aspect-square rounded-lg overflow-hidden shadow-soft cursor-pointer"
                         onClick={() => setSelectedPhoto(photo)}
                       >
-                        <img
-                          src={getImageUrl(photo.file_path)}
-                          alt={photo.file_name}
-                          className="w-full h-full object-cover"
-                        />
+                        <MediaThumb photo={photo} />
                       </div>
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
                         <Button
@@ -498,11 +521,7 @@ const Admin = () => {
                         className="aspect-square rounded-lg overflow-hidden shadow-soft ring-2 ring-destructive/30 opacity-70 cursor-pointer"
                         onClick={() => setSelectedPhoto(photo)}
                       >
-                        <img
-                          src={getImageUrl(photo.file_path)}
-                          alt={photo.file_name}
-                          className="w-full h-full object-cover"
-                        />
+                        <MediaThumb photo={photo} />
                       </div>
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
                         <Button
@@ -559,11 +578,7 @@ const Admin = () => {
                         className="aspect-square rounded-lg overflow-hidden shadow-soft ring-2 ring-primary/20 cursor-pointer"
                         onClick={() => setSelectedPhoto(photo)}
                       >
-                        <img
-                          src={getImageUrl(photo.file_path)}
-                          alt={photo.file_name}
-                          className="w-full h-full object-cover"
-                        />
+                        <MediaThumb photo={photo} />
                       </div>
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
                         <Button
@@ -943,11 +958,21 @@ const Admin = () => {
           </DialogTitle>
           {selectedPhoto && (
             <div className="relative">
-              <img
-                src={getImageUrl(selectedPhoto.file_path)}
-                alt={selectedPhoto.file_name}
-                className="w-full h-auto max-h-[80vh] object-contain bg-black"
-              />
+              {isVideo(selectedPhoto.file_name) ? (
+                <video
+                  src={getImageUrl(selectedPhoto.file_path)}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="w-full h-auto max-h-[80vh] object-contain bg-black"
+                />
+              ) : (
+                <img
+                  src={getImageUrl(selectedPhoto.file_path)}
+                  alt={selectedPhoto.file_name}
+                  className="w-full h-auto max-h-[80vh] object-contain bg-black"
+                />
+              )}
 
               {/* Prev / next navigation */}
               {selectedIndex > 0 && (

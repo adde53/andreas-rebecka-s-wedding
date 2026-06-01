@@ -129,6 +129,9 @@ const PhotoGallery = () => {
     return data.publicUrl;
   };
 
+  const isVideo = (fileName: string) =>
+    /\.(mp4|mov|webm|m4v|3gp|3gpp|quicktime)$/i.test(fileName);
+
   return (
     <section className="py-16 sm:py-24 bg-gradient-to-b from-soft-pink/20 via-blush/10 to-background relative overflow-hidden" id="gallery">
       {/* Decorative background elements */}
@@ -196,7 +199,7 @@ const PhotoGallery = () => {
                 <label className="relative block">
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/*,video/*"
                     multiple
                     onChange={handleFileUpload}
                     disabled={uploading}
@@ -216,14 +219,14 @@ const PhotoGallery = () => {
                       ) : (
                         <>
                           <Camera className="w-4 h-4 mr-2" />
-                          Ladda upp bilder
+                          Ladda upp bilder & videos
                         </>
                       )}
                     </span>
                   </Button>
                 </label>
                 <p className="text-xs text-muted-foreground font-body mt-3 text-center">
-                  Bilder granskas av brudparet innan de visas i galleriet
+                  Bilder och videos granskas av brudparet innan de visas i galleriet
                 </p>
               </>
             ) : (
@@ -280,12 +283,29 @@ const PhotoGallery = () => {
                 onClick={() => setSelectedPhotoIndex(index)}
               >
                 <div className="relative overflow-hidden rounded-2xl shadow-soft border border-blush/30 group-hover:border-dusty-rose/50 transition-all duration-500 group-hover:shadow-lg group-hover:-translate-y-1">
-                  <img
-                    src={getImageUrl(photo.file_path)}
-                    alt={photo.file_name}
-                    className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
-                    loading="lazy"
-                  />
+                  {isVideo(photo.file_name) ? (
+                    <>
+                      <video
+                        src={getImageUrl(photo.file_path)}
+                        className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+                        muted
+                        playsInline
+                        preload="metadata"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div className="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center">
+                          <svg className="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <img
+                      src={getImageUrl(photo.file_path)}
+                      alt={photo.file_name}
+                      className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-dusty-rose/40 via-transparent to-soft-pink/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="absolute inset-0 ring-2 ring-inset ring-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
@@ -338,18 +358,34 @@ const PhotoGallery = () => {
                 </button>
               )}
 
-              {/* Image */}
-              <motion.img
-                key={photos[selectedPhotoIndex].id}
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                src={getImageUrl(photos[selectedPhotoIndex].file_path)}
-                alt={photos[selectedPhotoIndex].file_name}
-                className="max-w-full max-h-[90vh] object-contain rounded-lg"
-                onClick={(e) => e.stopPropagation()}
-              />
+              {/* Media */}
+              {isVideo(photos[selectedPhotoIndex].file_name) ? (
+                <motion.video
+                  key={photos[selectedPhotoIndex].id}
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  src={getImageUrl(photos[selectedPhotoIndex].file_path)}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="max-w-full max-h-[90vh] object-contain rounded-lg"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              ) : (
+                <motion.img
+                  key={photos[selectedPhotoIndex].id}
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  src={getImageUrl(photos[selectedPhotoIndex].file_path)}
+                  alt={photos[selectedPhotoIndex].file_name}
+                  className="max-w-full max-h-[90vh] object-contain rounded-lg"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              )}
 
               {/* Photo counter */}
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/70 font-body text-sm">
