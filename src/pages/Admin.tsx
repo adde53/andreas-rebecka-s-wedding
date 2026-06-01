@@ -978,9 +978,11 @@ const Admin = () => {
                   "text-xs px-2 py-1 rounded-full font-body",
                   selectedPhoto.approved
                     ? "bg-primary/80 text-primary-foreground"
+                    : selectedPhoto.rejected
+                    ? "bg-destructive/80 text-destructive-foreground"
                     : "bg-yellow-500/80 text-white"
                 )}>
-                  {selectedPhoto.approved ? "Godkänd" : "Väntar"}
+                  {selectedPhoto.approved ? "Godkänd" : selectedPhoto.rejected ? "Nekad" : "Väntar"}
                 </span>
               </div>
 
