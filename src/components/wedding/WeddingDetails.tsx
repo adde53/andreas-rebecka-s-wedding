@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Church, PartyPopper, Clock, MapPin } from "lucide-react";
+import { Church, PartyPopper, Clock, MapPin, Bus } from "lucide-react";
 
 const WeddingDetails = () => {
   const details = [
@@ -78,6 +78,20 @@ const WeddingDetails = () => {
             </motion.div>
           ))}
         </div>
+
+        {/* Bus between ceremony and venue */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="max-w-md mx-auto mt-6 sm:mt-8 flex items-center gap-3 justify-center bg-card/80 backdrop-blur-sm p-3 sm:p-4 rounded-lg border border-blush/20 shadow-soft"
+        >
+          <Bus className="w-5 h-5 text-primary flex-shrink-0" />
+          <p className="text-xs sm:text-sm text-muted-foreground font-body">
+            Gemensam buss från kyrkan till Långängens Gård. Bussen kör två vändor.
+          </p>
+        </motion.div>
       </div>
     </section>
   );

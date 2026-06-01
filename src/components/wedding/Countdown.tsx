@@ -62,7 +62,7 @@ const Countdown = () => {
           <h2 className="text-xl sm:text-2xl md:text-3xl font-serif text-foreground mb-1 sm:mb-2">
             Nedräkning till bröllopet
           </h2>
-          <p className="text-sm sm:text-base text-muted-foreground font-body mb-6 sm:mb-8">
+          <p className="text-sm sm:text-base text-muted-foreground font-body mb-6 sm:mb-8 font-semibold">
             30 maj 2026 kl 14:30
           </p>
 

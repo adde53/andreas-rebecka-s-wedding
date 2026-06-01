@@ -167,8 +167,8 @@ const PhotoGallery = () => {
             <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-dusty-rose/60" />
             <div className="w-12 sm:w-16 h-px bg-gradient-to-l from-transparent to-dusty-rose/60" />
           </div>
-          <p className="text-sm sm:text-lg text-muted-foreground font-body max-w-lg mx-auto leading-relaxed px-2">
-            Dela dina minnen från festen med oss
+          <p className="text-muted-foreground font-body max-w-lg mx-auto text-lg leading-relaxed">
+            Dela dina bilder från bröllopet med oss
           </p>
         </motion.div>
 
@@ -236,8 +236,8 @@ const PhotoGallery = () => {
                   Bilduppladdning öppnar vid bröllopet
                 </p>
                 {uploadEnabledFrom && (
-                  <p className="text-sm text-primary font-body mt-2">
-                    {uploadEnabledFrom.toLocaleDateString("sv-SE", { 
+                  <p className="text-sm text-primary font-body mt-2 font-semibold">
+                    {uploadEnabledFrom.toLocaleDateString("sv-SE", {
                       day: "numeric", 
                       month: "long", 
                       year: "numeric" 

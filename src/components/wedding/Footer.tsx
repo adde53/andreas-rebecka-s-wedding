@@ -38,7 +38,7 @@ const Footer = () => {
           Olsson Krantz
         </p>
         <p className="font-body text-xs sm:text-sm opacity-80">
-          30 maj 2026 • Lidingö
+          <span className="font-semibold">30 maj 2026</span> • Lidingö
         </p>
         <p className="font-body text-xs mt-4 sm:mt-6 opacity-60">
           Vi ses där! 💐

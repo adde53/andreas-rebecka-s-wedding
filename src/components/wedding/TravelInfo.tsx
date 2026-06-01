@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Train, MapPin, Clock, ArrowRight } from "lucide-react";
+import { MapPin, Clock, ArrowRight } from "lucide-react";
 
 const TravelInfo = () => {
   const steps = [
@@ -99,6 +99,7 @@ const TravelInfo = () => {
               💡 Tips: Använd appen SL (Storstockholms Lokaltrafik) för att planera din resa och köpa biljett.
             </p>
           </motion.div>
+
 
           {/* Map links */}
           <motion.div

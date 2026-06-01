@@ -1,9 +1,13 @@
 import { motion } from "framer-motion";
-import { Gift, Shirt, Camera, Car, Heart, Utensils } from "lucide-react";
+import { Gift, Shirt, Camera, Car, Heart, Utensils, Bus } from "lucide-react";
 import swishQr from "@/assets/swish-qr.png";
 
 const GoodToKnow = () => {
-  const items = [
+  const items: Array<{
+    icon: React.ComponentType<{ className?: string }>;
+    title: string;
+    description: string | React.ReactNode;
+  }> = [
     {
       icon: Shirt,
       title: "Klädkod",
@@ -25,14 +29,29 @@ const GoodToKnow = () => {
       description: "Det finns parkeringsplatser vid både kyrkan och Långängens Gård. Tänk på att det är begränsat antal platser.",
     },
     {
+      icon: Bus,
+      title: "Gemensam buss",
+      description: "Efter vigseln åker alla gäster gemensam buss från Lidingö kyrka till Långängens Gård. Bussen kör två vändor.",
+    },
+    {
       icon: Utensils,
       title: "Mat & Allergier",
-      description: "Meddela eventuella allergier eller specialkost i samband med OSA 31 mars.",
+      description: (
+        <>
+          Meddela eventuella allergier eller specialkost i samband med <span className="font-semibold">OSA 31 mars</span>.
+        </>
+      ),
     },
     {
       icon: Heart,
       title: "Tal & Underhållning",
-      description: "Vill du hålla tal eller bidra med underhållning? Kontakta våra toastmasters \nVendela (070-053 90 29) eller \nLucas (076-818 15 63) senast 30 april.",
+      description: (
+        <>
+          Vill du hålla tal eller bidra med underhållning? Kontakta våra toastmasters{"\n"}
+          Vendela (070-053 90 29) eller{"\n"}
+          Lucas (076-818 15 63) senast <span className="font-semibold">30 april</span>.
+        </>
+      ),
     },
   ];
 

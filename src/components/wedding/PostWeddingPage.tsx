@@ -74,7 +74,7 @@ const PostWeddingPage = () => {
             className="flex items-center justify-center gap-4 text-muted-foreground"
           >
             <div className="h-px w-12 bg-primary/30" />
-            <span className="font-serif text-xl">30 maj 2026</span>
+            <span className="font-serif text-xl font-semibold">30 maj 2026</span>
             <div className="h-px w-12 bg-primary/30" />
           </motion.div>
         </div>

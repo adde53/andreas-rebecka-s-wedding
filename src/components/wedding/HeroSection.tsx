@@ -164,7 +164,7 @@ const HeroSection = () => {
           >
             <div className="flex items-center justify-center gap-2 sm:gap-3">
               <div className="w-6 sm:w-8 h-px bg-sage/40" />
-              <p className="text-lg sm:text-xl md:text-2xl font-serif text-muted-foreground">
+              <p className="text-lg sm:text-xl md:text-2xl font-serif text-muted-foreground font-semibold">
                 30 maj 2026
               </p>
               <div className="w-6 sm:w-8 h-px bg-sage/40" />
