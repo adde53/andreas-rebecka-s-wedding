@@ -358,18 +358,34 @@ const PhotoGallery = () => {
                 </button>
               )}
 
-              {/* Image */}
-              <motion.img
-                key={photos[selectedPhotoIndex].id}
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                src={getImageUrl(photos[selectedPhotoIndex].file_path)}
-                alt={photos[selectedPhotoIndex].file_name}
-                className="max-w-full max-h-[90vh] object-contain rounded-lg"
-                onClick={(e) => e.stopPropagation()}
-              />
+              {/* Media */}
+              {isVideo(photos[selectedPhotoIndex].file_name) ? (
+                <motion.video
+                  key={photos[selectedPhotoIndex].id}
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  src={getImageUrl(photos[selectedPhotoIndex].file_path)}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="max-w-full max-h-[90vh] object-contain rounded-lg"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              ) : (
+                <motion.img
+                  key={photos[selectedPhotoIndex].id}
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  src={getImageUrl(photos[selectedPhotoIndex].file_path)}
+                  alt={photos[selectedPhotoIndex].file_name}
+                  className="max-w-full max-h-[90vh] object-contain rounded-lg"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              )}
 
               {/* Photo counter */}
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/70 font-body text-sm">
