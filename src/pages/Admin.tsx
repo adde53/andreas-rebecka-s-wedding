@@ -459,8 +459,72 @@ const Admin = () => {
                         </Button>
                         <Button
                           size="sm"
+                          variant="outline"
+                          onClick={() => handleReject(photo.id)}
+                          title="Neka (flytta till nekade)"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            {/* Rejected photos */}
+            <section>
+              <h2 className="text-xl font-serif mb-4 text-foreground">
+                Nekade bilder ({rejectedPhotos.length})
+              </h2>
+              <p className="text-sm text-muted-foreground font-body mb-4">
+                Dessa bilder visas inte i galleriet men finns kvar och kan godkännas senare.
+              </p>
+
+              {rejectedPhotos.length === 0 ? (
+                <p className="text-muted-foreground font-body">
+                  Inga nekade bilder
+                </p>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {rejectedPhotos.map((photo) => (
+                    <motion.div
+                      key={photo.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="relative group"
+                    >
+                      <div
+                        className="aspect-square rounded-lg overflow-hidden shadow-soft ring-2 ring-destructive/30 opacity-70 cursor-pointer"
+                        onClick={() => setSelectedPhoto(photo)}
+                      >
+                        <img
+                          src={getImageUrl(photo.file_path)}
+                          alt={photo.file_name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => setSelectedPhoto(photo)}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => handleApprove(photo.id, true)}
+                          title="Godkänn"
+                        >
+                          <Check className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
                           variant="destructive"
                           onClick={() => handleDelete(photo.id, photo.file_path)}
+                          title="Ta bort permanent"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -470,6 +534,7 @@ const Admin = () => {
                 </div>
               )}
             </section>
+
 
             {/* Approved photos */}
             <section>
