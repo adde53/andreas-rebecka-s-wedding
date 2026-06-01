@@ -1005,7 +1005,7 @@ const Admin = () => {
                       <Download className="w-4 h-4 mr-2" />
                       Ladda ner
                     </Button>
-                    {!selectedPhoto.approved ? (
+                    {!selectedPhoto.approved && (
                       <Button
                         size="sm"
                         onClick={() => handleApprove(selectedPhoto.id, true)}
@@ -1013,11 +1013,22 @@ const Admin = () => {
                         <Check className="w-4 h-4 mr-2" />
                         Godkänn
                       </Button>
-                    ) : (
+                    )}
+                    {!selectedPhoto.approved && !selectedPhoto.rejected && (
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleApprove(selectedPhoto.id, false)}
+                        onClick={() => handleReject(selectedPhoto.id)}
+                      >
+                        <X className="w-4 h-4 mr-2" />
+                        Neka
+                      </Button>
+                    )}
+                    {selectedPhoto.approved && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleReject(selectedPhoto.id)}
                       >
                         <X className="w-4 h-4 mr-2" />
                         Neka
