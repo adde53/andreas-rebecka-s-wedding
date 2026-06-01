@@ -196,7 +196,7 @@ const PhotoGallery = () => {
                 <label className="relative block">
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/*,video/*"
                     multiple
                     onChange={handleFileUpload}
                     disabled={uploading}
@@ -216,14 +216,14 @@ const PhotoGallery = () => {
                       ) : (
                         <>
                           <Camera className="w-4 h-4 mr-2" />
-                          Ladda upp bilder
+                          Ladda upp bilder & videos
                         </>
                       )}
                     </span>
                   </Button>
                 </label>
                 <p className="text-xs text-muted-foreground font-body mt-3 text-center">
-                  Bilder granskas av brudparet innan de visas i galleriet
+                  Bilder och videos granskas av brudparet innan de visas i galleriet
                 </p>
               </>
             ) : (
