@@ -22,6 +22,7 @@ export type Database = {
           file_name: string
           file_path: string
           id: string
+          rejected: boolean
           uploaded_at: string
           uploaded_by: string | null
         }
@@ -32,6 +33,7 @@ export type Database = {
           file_name: string
           file_path: string
           id?: string
+          rejected?: boolean
           uploaded_at?: string
           uploaded_by?: string | null
         }
@@ -42,6 +44,7 @@ export type Database = {
           file_name?: string
           file_path?: string
           id?: string
+          rejected?: boolean
           uploaded_at?: string
           uploaded_by?: string | null
         }

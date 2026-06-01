@@ -37,6 +37,7 @@ interface Photo {
   caption: string | null;
   created_at: string;
   approved: boolean;
+  rejected: boolean;
 }
 
 interface WeddingSettings {
@@ -116,17 +117,17 @@ const Admin = () => {
     try {
       const { error } = await supabase
         .from("photos")
-        .update({ approved })
+        .update({ approved, rejected: false })
         .eq("id", photoId);
 
       if (error) throw error;
 
       setPhotos(photos.map(p => 
-        p.id === photoId ? { ...p, approved } : p
+        p.id === photoId ? { ...p, approved, rejected: false } : p
       ));
 
       toast({
-        title: approved ? "Bild godkänd!" : "Bild nekad",
+        title: approved ? "Bild godkänd!" : "Bild flyttad till väntelistan",
         description: approved 
           ? "Bilden visas nu i galleriet" 
           : "Bilden är dold från galleriet",
@@ -136,6 +137,33 @@ const Admin = () => {
       toast({
         title: "Fel",
         description: "Kunde inte uppdatera bilden",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleReject = async (photoId: string) => {
+    try {
+      const { error } = await supabase
+        .from("photos")
+        .update({ approved: false, rejected: true })
+        .eq("id", photoId);
+
+      if (error) throw error;
+
+      setPhotos(photos.map(p =>
+        p.id === photoId ? { ...p, approved: false, rejected: true } : p
+      ));
+
+      toast({
+        title: "Bild nekad",
+        description: "Bilden flyttades till nekade bilder och kan godkännas senare",
+      });
+    } catch (error) {
+      console.error("Error rejecting photo:", error);
+      toast({
+        title: "Fel",
+        description: "Kunde inte neka bilden",
         variant: "destructive",
       });
     }
@@ -286,11 +314,12 @@ const Admin = () => {
     }
   };
 
-  const pendingPhotos = photos.filter(p => !p.approved);
+  const pendingPhotos = photos.filter(p => !p.approved && !p.rejected);
+  const rejectedPhotos = photos.filter(p => p.rejected);
   const approvedPhotos = photos.filter(p => p.approved);
 
-  // Ordered list used for prev/next navigation in preview: pending first, then approved
-  const orderedPhotos = [...pendingPhotos, ...approvedPhotos];
+  // Ordered list used for prev/next navigation in preview: pending → rejected → approved
+  const orderedPhotos = [...pendingPhotos, ...rejectedPhotos, ...approvedPhotos];
   const selectedIndex = selectedPhoto
     ? orderedPhotos.findIndex(p => p.id === selectedPhoto.id)
     : -1;
@@ -430,8 +459,72 @@ const Admin = () => {
                         </Button>
                         <Button
                           size="sm"
+                          variant="outline"
+                          onClick={() => handleReject(photo.id)}
+                          title="Neka (flytta till nekade)"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            {/* Rejected photos */}
+            <section>
+              <h2 className="text-xl font-serif mb-4 text-foreground">
+                Nekade bilder ({rejectedPhotos.length})
+              </h2>
+              <p className="text-sm text-muted-foreground font-body mb-4">
+                Dessa bilder visas inte i galleriet men finns kvar och kan godkännas senare.
+              </p>
+
+              {rejectedPhotos.length === 0 ? (
+                <p className="text-muted-foreground font-body">
+                  Inga nekade bilder
+                </p>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {rejectedPhotos.map((photo) => (
+                    <motion.div
+                      key={photo.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="relative group"
+                    >
+                      <div
+                        className="aspect-square rounded-lg overflow-hidden shadow-soft ring-2 ring-destructive/30 opacity-70 cursor-pointer"
+                        onClick={() => setSelectedPhoto(photo)}
+                      >
+                        <img
+                          src={getImageUrl(photo.file_path)}
+                          alt={photo.file_name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => setSelectedPhoto(photo)}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => handleApprove(photo.id, true)}
+                          title="Godkänn"
+                        >
+                          <Check className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
                           variant="destructive"
                           onClick={() => handleDelete(photo.id, photo.file_path)}
+                          title="Ta bort permanent"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -441,6 +534,7 @@ const Admin = () => {
                 </div>
               )}
             </section>
+
 
             {/* Approved photos */}
             <section>
@@ -884,9 +978,11 @@ const Admin = () => {
                   "text-xs px-2 py-1 rounded-full font-body",
                   selectedPhoto.approved
                     ? "bg-primary/80 text-primary-foreground"
+                    : selectedPhoto.rejected
+                    ? "bg-destructive/80 text-destructive-foreground"
                     : "bg-yellow-500/80 text-white"
                 )}>
-                  {selectedPhoto.approved ? "Godkänd" : "Väntar"}
+                  {selectedPhoto.approved ? "Godkänd" : selectedPhoto.rejected ? "Nekad" : "Väntar"}
                 </span>
               </div>
 
@@ -909,7 +1005,7 @@ const Admin = () => {
                       <Download className="w-4 h-4 mr-2" />
                       Ladda ner
                     </Button>
-                    {!selectedPhoto.approved ? (
+                    {!selectedPhoto.approved && (
                       <Button
                         size="sm"
                         onClick={() => handleApprove(selectedPhoto.id, true)}
@@ -917,11 +1013,22 @@ const Admin = () => {
                         <Check className="w-4 h-4 mr-2" />
                         Godkänn
                       </Button>
-                    ) : (
+                    )}
+                    {!selectedPhoto.approved && !selectedPhoto.rejected && (
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleApprove(selectedPhoto.id, false)}
+                        onClick={() => handleReject(selectedPhoto.id)}
+                      >
+                        <X className="w-4 h-4 mr-2" />
+                        Neka
+                      </Button>
+                    )}
+                    {selectedPhoto.approved && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleReject(selectedPhoto.id)}
                       >
                         <X className="w-4 h-4 mr-2" />
                         Neka
