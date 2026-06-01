@@ -283,12 +283,29 @@ const PhotoGallery = () => {
                 onClick={() => setSelectedPhotoIndex(index)}
               >
                 <div className="relative overflow-hidden rounded-2xl shadow-soft border border-blush/30 group-hover:border-dusty-rose/50 transition-all duration-500 group-hover:shadow-lg group-hover:-translate-y-1">
-                  <img
-                    src={getImageUrl(photo.file_path)}
-                    alt={photo.file_name}
-                    className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
-                    loading="lazy"
-                  />
+                  {isVideo(photo.file_name) ? (
+                    <>
+                      <video
+                        src={getImageUrl(photo.file_path)}
+                        className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+                        muted
+                        playsInline
+                        preload="metadata"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div className="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center">
+                          <svg className="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <img
+                      src={getImageUrl(photo.file_path)}
+                      alt={photo.file_name}
+                      className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-dusty-rose/40 via-transparent to-soft-pink/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="absolute inset-0 ring-2 ring-inset ring-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
