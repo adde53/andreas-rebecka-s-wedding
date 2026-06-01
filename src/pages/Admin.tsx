@@ -958,11 +958,21 @@ const Admin = () => {
           </DialogTitle>
           {selectedPhoto && (
             <div className="relative">
-              <img
-                src={getImageUrl(selectedPhoto.file_path)}
-                alt={selectedPhoto.file_name}
-                className="w-full h-auto max-h-[80vh] object-contain bg-black"
-              />
+              {isVideo(selectedPhoto.file_name) ? (
+                <video
+                  src={getImageUrl(selectedPhoto.file_path)}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="w-full h-auto max-h-[80vh] object-contain bg-black"
+                />
+              ) : (
+                <img
+                  src={getImageUrl(selectedPhoto.file_path)}
+                  alt={selectedPhoto.file_name}
+                  className="w-full h-auto max-h-[80vh] object-contain bg-black"
+                />
+              )}
 
               {/* Prev / next navigation */}
               {selectedIndex > 0 && (
