@@ -253,7 +253,6 @@ const Admin = () => {
   const isVideo = (fileName: string) =>
     /\.(mp4|mov|webm|m4v|3gp|3gpp|quicktime)$/i.test(fileName);
 
-                      {selectedPhoto.view_count > 0 && ` · ${selectedPhoto.view_count} visningar`}
   const MediaThumb = ({ photo }: { photo: Photo }) => (
     <div className="relative w-full h-full">
       {isVideo(photo.file_name) ? (
@@ -277,6 +276,8 @@ const Admin = () => {
           fileName={photo.file_name}
           alt={photo.file_name}
           className="w-full h-full object-cover"
+          loading="lazy"
+          decoding="async"
         />
       )}
       {photo.view_count > 0 && (
@@ -287,6 +288,7 @@ const Admin = () => {
       )}
     </div>
   );
+
 
   const handleDownloadAll = async () => {
     setDownloading(true);
@@ -388,6 +390,18 @@ const Admin = () => {
       setSelectedPhoto(updated);
     }
   }, [photos, selectedPhoto]);
+
+  // Preload neighboring images for snappy navigation
+  useEffect(() => {
+    if (selectedIndex < 0) return;
+    [selectedIndex - 1, selectedIndex + 1, selectedIndex + 2].forEach((i) => {
+      const p = orderedPhotos[i];
+      if (!p || isVideo(p.file_name)) return;
+      const img = new Image();
+      img.src = getImageUrl(p.file_path);
+    });
+  }, [selectedIndex, orderedPhotos]);
+
 
   if (authLoading || loading) {
     return (
@@ -965,133 +979,174 @@ const Admin = () => {
 
       {/* Photo preview dialog */}
       <Dialog open={!!selectedPhoto} onOpenChange={() => setSelectedPhoto(null)}>
-        <DialogContent className="max-w-4xl p-0 overflow-hidden">
+        <DialogContent className="max-w-[96vw] w-[96vw] h-[94vh] p-0 overflow-hidden bg-black border-0 flex flex-col">
           <DialogTitle className="sr-only">
             Förhandsvisning av bild
           </DialogTitle>
           {selectedPhoto && (
-            <div className="relative">
-              {isVideo(selectedPhoto.file_name) ? (
-                <video
-                  src={getImageUrl(selectedPhoto.file_path)}
-                  controls
-                  autoPlay
-                  playsInline
-                  className="w-full h-auto max-h-[80vh] object-contain bg-black"
-                />
-              ) : (
-                <HeicImage
-                  src={getImageUrl(selectedPhoto.file_path)}
-                  fileName={selectedPhoto.file_name}
-                  alt={selectedPhoto.file_name}
-                  className="w-full h-auto max-h-[80vh] object-contain bg-black"
-                />
-              )}
+            <>
+              {/* Media area */}
+              <div className="relative flex-1 min-h-0 flex items-center justify-center bg-black">
+                {isVideo(selectedPhoto.file_name) ? (
+                  <video
+                    key={selectedPhoto.id}
+                    src={getImageUrl(selectedPhoto.file_path)}
+                    controls
+                    autoPlay
+                    playsInline
+                    className="max-w-full max-h-full object-contain"
+                  />
+                ) : (
+                  <HeicImage
+                    key={selectedPhoto.id}
+                    src={getImageUrl(selectedPhoto.file_path)}
+                    fileName={selectedPhoto.file_name}
+                    alt={selectedPhoto.file_name}
+                    className="max-w-full max-h-full object-contain"
+                    decoding="async"
+                  />
+                )}
 
-              {/* Prev / next navigation */}
-              {selectedIndex > 0 && (
-                <button
-                  onClick={() => goToPhoto(-1)}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/40 hover:bg-black/60 text-white transition-colors"
-                  aria-label="Föregående bild"
-                >
-                  <ChevronLeft className="w-6 h-6" />
-                </button>
-              )}
-              {selectedIndex >= 0 && selectedIndex < orderedPhotos.length - 1 && (
-                <button
-                  onClick={() => goToPhoto(1)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/40 hover:bg-black/60 text-white transition-colors"
-                  aria-label="Nästa bild"
-                >
-                  <ChevronRight className="w-6 h-6" />
-                </button>
-              )}
+                {/* Prev / next navigation */}
+                {selectedIndex > 0 && (
+                  <button
+                    onClick={() => goToPhoto(-1)}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 hover:bg-black/80 text-white transition-colors"
+                    aria-label="Föregående bild"
+                  >
+                    <ChevronLeft className="w-7 h-7" />
+                  </button>
+                )}
+                {selectedIndex >= 0 && selectedIndex < orderedPhotos.length - 1 && (
+                  <button
+                    onClick={() => goToPhoto(1)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 hover:bg-black/80 text-white transition-colors"
+                    aria-label="Nästa bild"
+                  >
+                    <ChevronRight className="w-7 h-7" />
+                  </button>
+                )}
 
-              {/* Counter + approval badge */}
-              <div className="absolute top-2 left-2 flex gap-2">
-                <span className="bg-black/50 text-white text-xs px-2 py-1 rounded-full font-body">
-                  {selectedIndex + 1} / {orderedPhotos.length}
-                </span>
-                <span className={cn(
-                  "text-xs px-2 py-1 rounded-full font-body",
-                  selectedPhoto.approved
-                    ? "bg-primary/80 text-primary-foreground"
-                    : selectedPhoto.rejected
-                    ? "bg-destructive/80 text-destructive-foreground"
-                    : "bg-yellow-500/80 text-white"
-                )}>
-                  {selectedPhoto.approved ? "Godkänd" : selectedPhoto.rejected ? "Nekad" : "Väntar"}
-                </span>
-              </div>
+                {/* Counter + approval badge */}
+                <div className="absolute top-3 left-3 flex gap-2">
+                  <span className="bg-black/60 text-white text-xs px-3 py-1.5 rounded-full font-body">
+                    {selectedIndex + 1} / {orderedPhotos.length}
+                  </span>
+                  <span className={cn(
+                    "text-xs px-3 py-1.5 rounded-full font-body",
+                    selectedPhoto.approved
+                      ? "bg-primary/90 text-primary-foreground"
+                      : selectedPhoto.rejected
+                      ? "bg-destructive/90 text-destructive-foreground"
+                      : "bg-yellow-500/90 text-white"
+                  )}>
+                    {selectedPhoto.approved ? "Godkänd" : selectedPhoto.rejected ? "Nekad" : "Väntar"}
+                  </span>
+                </div>
 
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                <div className="flex items-end justify-between gap-3 flex-wrap">
-                  <div>
-                    <p className="text-white font-body text-sm">
-                      {selectedPhoto.uploaded_by || "Okänd"}
-                    </p>
-                    <p className="text-white/70 font-body text-xs">
-                      {format(new Date(selectedPhoto.created_at), "d MMMM yyyy 'kl' HH:mm", { locale: sv })}
-                    </p>
-                  </div>
-                  <div className="flex gap-2 flex-wrap">
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => handleDownloadSingle(selectedPhoto)}
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Ladda ner
-                    </Button>
-                    {!selectedPhoto.approved && (
+                {/* Info + actions overlay */}
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-4 pt-12">
+                  <div className="flex items-end justify-between gap-3 flex-wrap">
+                    <div>
+                      <p className="text-white font-body text-sm">
+                        {selectedPhoto.uploaded_by || "Okänd"}
+                      </p>
+                      <p className="text-white/70 font-body text-xs">
+                        {format(new Date(selectedPhoto.created_at), "d MMMM yyyy 'kl' HH:mm", { locale: sv })}
+                      </p>
+                    </div>
+                    <div className="flex gap-2 flex-wrap">
                       <Button
                         size="sm"
-                        onClick={() => handleApprove(selectedPhoto.id, true)}
+                        variant="secondary"
+                        onClick={() => handleDownloadSingle(selectedPhoto)}
                       >
-                        <Check className="w-4 h-4 mr-2" />
-                        Godkänn
+                        <Download className="w-4 h-4 mr-2" />
+                        Ladda ner
                       </Button>
-                    )}
-                    {!selectedPhoto.approved && !selectedPhoto.rejected && (
+                      {!selectedPhoto.approved && (
+                        <Button
+                          size="sm"
+                          onClick={() => handleApprove(selectedPhoto.id, true)}
+                        >
+                          <Check className="w-4 h-4 mr-2" />
+                          Godkänn
+                        </Button>
+                      )}
+                      {!selectedPhoto.rejected && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleReject(selectedPhoto.id)}
+                        >
+                          <X className="w-4 h-4 mr-2" />
+                          Neka
+                        </Button>
+                      )}
                       <Button
                         size="sm"
-                        variant="outline"
-                        onClick={() => handleReject(selectedPhoto.id)}
+                        variant="destructive"
+                        onClick={() => {
+                          handleDelete(selectedPhoto.id, selectedPhoto.file_path);
+                          setSelectedPhoto(null);
+                        }}
                       >
-                        <X className="w-4 h-4 mr-2" />
-                        Neka
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Ta bort
                       </Button>
-                    )}
-                    {selectedPhoto.approved && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleReject(selectedPhoto.id)}
-                      >
-                        <X className="w-4 h-4 mr-2" />
-                        Neka
-                      </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => {
-                        handleDelete(selectedPhoto.id, selectedPhoto.file_path);
-                        setSelectedPhoto(null);
-                      }}
-                    >
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Ta bort
-                    </Button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
 
+              {/* Filmstrip */}
+              <div className="shrink-0 bg-black/90 border-t border-white/10 px-2 py-2 overflow-x-auto">
+                <div className="flex gap-2">
+                  {orderedPhotos.map((p, i) => (
+                    <button
+                      key={p.id}
+                      onClick={() => setSelectedPhoto(p)}
+                      ref={(el) => {
+                        if (el && p.id === selectedPhoto.id) {
+                          el.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
+                        }
+                      }}
+                      className={cn(
+                        "relative shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all",
+                        p.id === selectedPhoto.id
+                          ? "border-primary scale-105"
+                          : "border-transparent opacity-60 hover:opacity-100"
+                      )}
+                      aria-label={`Bild ${i + 1}`}
+                    >
+                      {isVideo(p.file_name) ? (
+                        <div className="w-full h-full bg-muted flex items-center justify-center">
+                          <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                      ) : (
+                        <img
+                          src={getImageUrl(p.file_path)}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                      {p.approved && (
+                        <span className="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full m-0.5" />
+                      )}
+                      {p.rejected && (
+                        <span className="absolute top-0 right-0 w-2 h-2 bg-destructive rounded-full m-0.5" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
+
     </div>
   );
 };
