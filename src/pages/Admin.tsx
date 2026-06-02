@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { sv } from "date-fns/locale";
 import JSZip from "jszip";
+import heic2any from "heic2any";
 import { 
   Check, 
   X, 
@@ -16,7 +17,8 @@ import {
   Download,
   Eye,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Wand2
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
