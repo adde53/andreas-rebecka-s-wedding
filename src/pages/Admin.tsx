@@ -520,9 +520,28 @@ const Admin = () => {
           </TabsList>
 
           <TabsContent value="photos" className="space-y-8">
-            {/* Download all button */}
+            {/* Action buttons */}
             {photos.length > 0 && (
-              <div className="flex justify-end">
+              <div className="flex justify-end gap-2 flex-wrap">
+                {photos.some(p => isHeic(p.file_name) || isHeic(p.file_path)) && (
+                  <Button
+                    onClick={handleConvertHeic}
+                    disabled={converting}
+                    variant="outline"
+                  >
+                    {converting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Konverterar {convertProgress.done}/{convertProgress.total}...
+                      </>
+                    ) : (
+                      <>
+                        <Wand2 className="w-4 h-4 mr-2" />
+                        Konvertera HEIC ({photos.filter(p => isHeic(p.file_name) || isHeic(p.file_path)).length})
+                      </>
+                    )}
+                  </Button>
+                )}
                 <Button
                   onClick={handleDownloadAll}
                   disabled={downloading}
@@ -537,6 +556,7 @@ const Admin = () => {
                 </Button>
               </div>
             )}
+
 
             {/* Pending photos */}
             <section>
