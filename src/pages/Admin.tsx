@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { sv } from "date-fns/locale";
 import JSZip from "jszip";
+import heic2any from "heic2any";
 import { 
   Check, 
   X, 
@@ -16,7 +17,8 @@ import {
   Download,
   Eye,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Wand2
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -59,6 +61,8 @@ const Admin = () => {
   const [savingDate, setSavingDate] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const [downloading, setDownloading] = useState(false);
+  const [converting, setConverting] = useState(false);
+  const [convertProgress, setConvertProgress] = useState({ done: 0, total: 0 });
   
   const { user, isAdmin, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
@@ -356,6 +360,73 @@ const Admin = () => {
     }
   };
 
+  const isHeic = (fileName: string) => /\.(heic|heif)$/i.test(fileName);
+
+  const handleConvertHeic = async () => {
+    const heicPhotos = photos.filter(p => isHeic(p.file_name) || isHeic(p.file_path));
+    if (heicPhotos.length === 0) {
+      toast({ title: "Inga HEIC-bilder", description: "Alla bilder är redan i optimerat format." });
+      return;
+    }
+    if (!confirm(`Konvertera ${heicPhotos.length} HEIC-bilder till JPEG? Det kan ta en stund.`)) return;
+
+    setConverting(true);
+    setConvertProgress({ done: 0, total: heicPhotos.length });
+    let success = 0;
+    let failed = 0;
+
+    for (const photo of heicPhotos) {
+      try {
+        const url = getImageUrl(photo.file_path);
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`Fetch ${res.status}`);
+        const buf = await res.arrayBuffer();
+        const heicBlob = new Blob([buf], { type: "image/heic" });
+        const result = await heic2any({ blob: heicBlob, toType: "image/jpeg", quality: 0.85 });
+        const jpegBlob = Array.isArray(result) ? result[0] : result;
+
+        const newPath = photo.file_path.replace(/\.(heic|heif)$/i, ".jpg");
+        const newName = photo.file_name.replace(/\.(heic|heif)$/i, ".jpg");
+        const finalPath = newPath === photo.file_path ? `${photo.file_path}.jpg` : newPath;
+
+        const { error: upErr } = await supabase.storage
+          .from("wedding-photos")
+          .upload(finalPath, jpegBlob, { contentType: "image/jpeg", upsert: true });
+        if (upErr) throw upErr;
+
+        const { error: dbErr } = await supabase
+          .from("photos")
+          .update({ file_path: finalPath, file_name: newName })
+          .eq("id", photo.id);
+        if (dbErr) throw dbErr;
+
+        // Remove old HEIC file if path changed
+        if (finalPath !== photo.file_path) {
+          await supabase.storage.from("wedding-photos").remove([photo.file_path]);
+        }
+
+        setPhotos(prev => prev.map(p =>
+          p.id === photo.id ? { ...p, file_path: finalPath, file_name: newName } : p
+        ));
+        success++;
+      } catch (e) {
+        console.error("HEIC convert failed for", photo.file_name, e);
+        failed++;
+      } finally {
+        setConvertProgress(prev => ({ ...prev, done: prev.done + 1 }));
+      }
+    }
+
+    setConverting(false);
+    toast({
+      title: "Konvertering klar",
+      description: `${success} konverterade${failed > 0 ? `, ${failed} misslyckades` : ""}.`,
+      variant: failed > 0 ? "destructive" : "default",
+    });
+  };
+
+
+
   const pendingPhotos = photos.filter(p => !p.approved && !p.rejected);
   const rejectedPhotos = photos.filter(p => p.rejected);
   const approvedPhotos = photos.filter(p => p.approved);
@@ -449,9 +520,28 @@ const Admin = () => {
           </TabsList>
 
           <TabsContent value="photos" className="space-y-8">
-            {/* Download all button */}
+            {/* Action buttons */}
             {photos.length > 0 && (
-              <div className="flex justify-end">
+              <div className="flex justify-end gap-2 flex-wrap">
+                {photos.some(p => isHeic(p.file_name) || isHeic(p.file_path)) && (
+                  <Button
+                    onClick={handleConvertHeic}
+                    disabled={converting}
+                    variant="outline"
+                  >
+                    {converting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Konverterar {convertProgress.done}/{convertProgress.total}...
+                      </>
+                    ) : (
+                      <>
+                        <Wand2 className="w-4 h-4 mr-2" />
+                        Konvertera HEIC ({photos.filter(p => isHeic(p.file_name) || isHeic(p.file_path)).length})
+                      </>
+                    )}
+                  </Button>
+                )}
                 <Button
                   onClick={handleDownloadAll}
                   disabled={downloading}
@@ -466,6 +556,7 @@ const Admin = () => {
                 </Button>
               </div>
             )}
+
 
             {/* Pending photos */}
             <section>
