@@ -24,6 +24,7 @@ const PhotoGallery = () => {
   const [loading, setLoading] = useState(true);
   const [uploadsEnabled, setUploadsEnabled] = useState(false);
   const [uploadEnabledFrom, setUploadEnabledFrom] = useState<Date | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -67,7 +68,7 @@ const PhotoGallery = () => {
     }
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
@@ -80,22 +81,28 @@ const PhotoGallery = () => {
       return;
     }
 
+    setSelectedFiles(Array.from(files));
+    // Reset input so the same files can be re-selected
+    event.target.value = "";
+  };
+
+  const handleConfirmUpload = async () => {
+    if (selectedFiles.length === 0) return;
+
     setUploading(true);
 
     try {
-      for (const file of Array.from(files)) {
+      for (const file of selectedFiles) {
         const fileExt = file.name.split(".").pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
         const filePath = `gallery/${fileName}`;
 
-        // Upload to storage
         const { error: uploadError } = await supabase.storage
           .from("wedding-photos")
           .upload(filePath, file);
 
         if (uploadError) throw uploadError;
 
-        // Save to database
         const { error: dbError } = await supabase.from("photos").insert({
           file_path: filePath,
           file_name: file.name,
@@ -110,6 +117,7 @@ const PhotoGallery = () => {
         description: "Tack! Dina bilder väntar på godkännande av brudparet.",
       });
 
+      setSelectedFiles([]);
     } catch (error) {
       console.error("Error uploading:", error);
       toast({
@@ -120,6 +128,14 @@ const PhotoGallery = () => {
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleCancelUpload = () => {
+    setSelectedFiles([]);
+  };
+
+  const removeSelectedFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const getImageUrl = (filePath: string) => {
@@ -201,7 +217,7 @@ const PhotoGallery = () => {
                     type="file"
                     accept="image/*,video/*"
                     multiple
-                    onChange={handleFileUpload}
+                    onChange={handleFileSelect}
                     disabled={uploading}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
                   />
@@ -211,20 +227,71 @@ const PhotoGallery = () => {
                     asChild
                   >
                     <span>
-                      {uploading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Laddar upp...
-                        </>
-                      ) : (
-                        <>
-                          <Camera className="w-4 h-4 mr-2" />
-                          Ladda upp bilder & videos
-                        </>
-                      )}
+                      <Camera className="w-4 h-4 mr-2" />
+                      Välj bilder & videos
                     </span>
                   </Button>
                 </label>
+
+                {/* Preview selected files */}
+                {selectedFiles.length > 0 && (
+                  <div className="mt-4 space-y-3">
+                    <p className="text-sm font-body text-foreground font-medium">
+                      {selectedFiles.length} {selectedFiles.length === 1 ? "fil vald" : "filer valda"}
+                    </p>
+                    <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
+                      {selectedFiles.map((file, index) => (
+                        <div key={index} className="relative aspect-square rounded-lg overflow-hidden bg-muted">
+                          {file.type.startsWith("video/") ? (
+                            <div className="w-full h-full flex items-center justify-center bg-muted">
+                              <span className="text-xs text-muted-foreground font-body text-center px-1 truncate">{file.name}</span>
+                            </div>
+                          ) : (
+                            <img
+                              src={URL.createObjectURL(file)}
+                              alt={file.name}
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                          <button
+                            onClick={() => removeSelectedFile(index)}
+                            className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        className="flex-1 font-body"
+                        onClick={handleConfirmUpload}
+                        disabled={uploading}
+                      >
+                        {uploading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Laddar upp...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-4 h-4 mr-2" />
+                            Ladda upp {selectedFiles.length} {selectedFiles.length === 1 ? "fil" : "filer"}
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={handleCancelUpload}
+                        disabled={uploading}
+                        className="font-body"
+                      >
+                        Avbryt
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
                 <p className="text-xs text-muted-foreground font-body mt-3 text-center">
                   Bilder och videos granskas av brudparet innan de visas i galleriet
                 </p>
@@ -280,7 +347,10 @@ const PhotoGallery = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.03 }}
                 className="break-inside-avoid cursor-pointer group"
-                onClick={() => setSelectedPhotoIndex(index)}
+                onClick={() => {
+                  setSelectedPhotoIndex(index);
+                  supabase.rpc('increment_view_count', { photo_id: photo.id }).then();
+                }}
               >
                 <div className="relative overflow-hidden rounded-2xl shadow-soft border border-blush/30 group-hover:border-dusty-rose/50 transition-all duration-500 group-hover:shadow-lg group-hover:-translate-y-1">
                   {isVideo(photo.file_name) ? (
@@ -338,7 +408,9 @@ const PhotoGallery = () => {
                   className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white z-10 p-2 rounded-full bg-black/30 hover:bg-black/50 transition-colors"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setSelectedPhotoIndex(selectedPhotoIndex - 1);
+                    const newIndex = selectedPhotoIndex - 1;
+                    setSelectedPhotoIndex(newIndex);
+                    supabase.rpc('increment_view_count', { photo_id: photos[newIndex].id }).then();
                   }}
                 >
                   <ChevronLeft className="w-8 h-8" />
@@ -351,7 +423,9 @@ const PhotoGallery = () => {
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white z-10 p-2 rounded-full bg-black/30 hover:bg-black/50 transition-colors"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setSelectedPhotoIndex(selectedPhotoIndex + 1);
+                    const newIndex = selectedPhotoIndex + 1;
+                    setSelectedPhotoIndex(newIndex);
+                    supabase.rpc('increment_view_count', { photo_id: photos[newIndex].id }).then();
                   }}
                 >
                   <ChevronRight className="w-8 h-8" />

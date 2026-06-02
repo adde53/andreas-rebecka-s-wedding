@@ -25,6 +25,7 @@ export type Database = {
           rejected: boolean
           uploaded_at: string
           uploaded_by: string | null
+          view_count: number
         }
         Insert: {
           approved?: boolean
@@ -36,6 +37,7 @@ export type Database = {
           rejected?: boolean
           uploaded_at?: string
           uploaded_by?: string | null
+          view_count?: number
         }
         Update: {
           approved?: boolean
@@ -47,6 +49,7 @@ export type Database = {
           rejected?: boolean
           uploaded_at?: string
           uploaded_by?: string | null
+          view_count?: number
         }
         Relationships: []
       }

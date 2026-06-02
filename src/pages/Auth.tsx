@@ -57,9 +57,10 @@ const Auth = () => {
           : error.message,
         variant: "destructive",
       });
+      setIsLoading(false);
+    } else {
+      navigate("/admin");
     }
-
-    setIsLoading(false);
   };
 
   if (loading) {
