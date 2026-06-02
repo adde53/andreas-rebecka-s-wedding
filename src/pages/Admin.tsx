@@ -61,6 +61,8 @@ const Admin = () => {
   const [savingDate, setSavingDate] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const [downloading, setDownloading] = useState(false);
+  const [converting, setConverting] = useState(false);
+  const [convertProgress, setConvertProgress] = useState({ done: 0, total: 0 });
   
   const { user, isAdmin, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
