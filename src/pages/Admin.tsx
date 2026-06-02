@@ -253,7 +253,6 @@ const Admin = () => {
   const isVideo = (fileName: string) =>
     /\.(mp4|mov|webm|m4v|3gp|3gpp|quicktime)$/i.test(fileName);
 
-                      {selectedPhoto.view_count > 0 && ` · ${selectedPhoto.view_count} visningar`}
   const MediaThumb = ({ photo }: { photo: Photo }) => (
     <div className="relative w-full h-full">
       {isVideo(photo.file_name) ? (
@@ -277,6 +276,8 @@ const Admin = () => {
           fileName={photo.file_name}
           alt={photo.file_name}
           className="w-full h-full object-cover"
+          loading="lazy"
+          decoding="async"
         />
       )}
       {photo.view_count > 0 && (
@@ -287,6 +288,7 @@ const Admin = () => {
       )}
     </div>
   );
+
 
   const handleDownloadAll = async () => {
     setDownloading(true);
