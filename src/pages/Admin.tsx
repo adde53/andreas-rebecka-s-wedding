@@ -391,6 +391,18 @@ const Admin = () => {
     }
   }, [photos, selectedPhoto]);
 
+  // Preload neighboring images for snappy navigation
+  useEffect(() => {
+    if (selectedIndex < 0) return;
+    [selectedIndex - 1, selectedIndex + 1, selectedIndex + 2].forEach((i) => {
+      const p = orderedPhotos[i];
+      if (!p || isVideo(p.file_name)) return;
+      const img = new Image();
+      img.src = getImageUrl(p.file_path);
+    });
+  }, [selectedIndex, orderedPhotos]);
+
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
