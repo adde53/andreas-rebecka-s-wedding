@@ -110,6 +110,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_view_count: { Args: { photo_id: string }; Returns: undefined }
       uploads_enabled: { Args: never; Returns: boolean }
     }
     Enums: {
