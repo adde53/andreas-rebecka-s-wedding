@@ -28,6 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import HeicImage from "@/components/HeicImage";
 
 interface Photo {
   id: string;
@@ -271,8 +272,9 @@ const Admin = () => {
           </div>
         </>
       ) : (
-        <img
+        <HeicImage
           src={getImageUrl(photo.file_path)}
+          fileName={photo.file_name}
           alt={photo.file_name}
           className="w-full h-full object-cover"
         />
@@ -978,8 +980,9 @@ const Admin = () => {
                   className="w-full h-auto max-h-[80vh] object-contain bg-black"
                 />
               ) : (
-                <img
+                <HeicImage
                   src={getImageUrl(selectedPhoto.file_path)}
+                  fileName={selectedPhoto.file_name}
                   alt={selectedPhoto.file_name}
                   className="w-full h-auto max-h-[80vh] object-contain bg-black"
                 />

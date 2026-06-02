@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import heic2any from "heic2any";
+import HeicImage from "@/components/HeicImage";
 
 interface Photo {
   id: string;
@@ -86,13 +88,26 @@ const PhotoGallery = () => {
     event.target.value = "";
   };
 
+  const convertHeicToJpeg = async (file: File): Promise<File> => {
+    const heicExtensions = /\.(heic|heif)$/i;
+    if (!heicExtensions.test(file.name) && !file.type.includes("heic") && !file.type.includes("heif")) {
+      return file;
+    }
+    const blob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.85 }) as Blob;
+    const newName = file.name.replace(/\.(heic|heif)$/i, ".jpg");
+    return new File([blob], newName, { type: "image/jpeg" });
+  };
+
   const handleConfirmUpload = async () => {
     if (selectedFiles.length === 0) return;
 
     setUploading(true);
 
     try {
-      for (const file of selectedFiles) {
+      for (let file of selectedFiles) {
+        // Convert HEIC/HEIF to JPEG
+        file = await convertHeicToJpeg(file);
+
         const fileExt = file.name.split(".").pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
         const filePath = `gallery/${fileName}`;
@@ -215,7 +230,7 @@ const PhotoGallery = () => {
                 <label className="relative block">
                   <input
                     type="file"
-                    accept="image/*,video/*"
+                    accept="image/*,video/*,.heic,.heif"
                     multiple
                     onChange={handleFileSelect}
                     disabled={uploading}
@@ -369,8 +384,9 @@ const PhotoGallery = () => {
                       </div>
                     </>
                   ) : (
-                    <img
+                    <HeicImage
                       src={getImageUrl(photo.file_path)}
+                      fileName={photo.file_name}
                       alt={photo.file_name}
                       className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
                       loading="lazy"
@@ -448,17 +464,21 @@ const PhotoGallery = () => {
                   onClick={(e) => e.stopPropagation()}
                 />
               ) : (
-                <motion.img
+                <motion.div
                   key={photos[selectedPhotoIndex].id}
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.9, opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  src={getImageUrl(photos[selectedPhotoIndex].file_path)}
-                  alt={photos[selectedPhotoIndex].file_name}
-                  className="max-w-full max-h-[90vh] object-contain rounded-lg"
                   onClick={(e) => e.stopPropagation()}
-                />
+                >
+                  <HeicImage
+                    src={getImageUrl(photos[selectedPhotoIndex].file_path)}
+                    fileName={photos[selectedPhotoIndex].file_name}
+                    alt={photos[selectedPhotoIndex].file_name}
+                    className="max-w-full max-h-[90vh] object-contain rounded-lg"
+                  />
+                </motion.div>
               )}
 
               {/* Photo counter */}
