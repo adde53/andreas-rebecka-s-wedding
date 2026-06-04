@@ -9,8 +9,10 @@ import PhotoGallery from "@/components/wedding/PhotoGallery";
 import Footer from "@/components/wedding/Footer";
 import PostWeddingPage from "@/components/wedding/PostWeddingPage";
 import { supabase } from "@/integrations/supabase/client";
+import { useVisitTracker } from "@/hooks/useVisitTracker";
 
 const Index = () => {
+  useVisitTracker();
   const [showPostWedding, setShowPostWedding] = useState<boolean | null>(null);
 
   useEffect(() => {
