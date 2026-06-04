@@ -365,51 +365,188 @@ const PhotoGallery = () => {
             </p>
           </motion.div>
         ) : (
-          <div className="columns-2 md:columns-3 lg:columns-4 gap-2 sm:gap-4 space-y-2 sm:space-y-4">
-            {photos.map((photo, index) => (
-              <motion.div
-                key={photo.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.03 }}
-                className="break-inside-avoid cursor-pointer group"
-                onClick={() => {
-                  setSelectedPhotoIndex(index);
-                  supabase.rpc('increment_view_count', { photo_id: photo.id }).then();
-                }}
-              >
-                <div className="relative overflow-hidden rounded-2xl shadow-soft border border-blush/30 group-hover:border-dusty-rose/50 transition-all duration-500 group-hover:shadow-lg group-hover:-translate-y-1">
-                  {isVideo(photo.file_name) ? (
-                    <>
-                      <video
-                        src={getImageUrl(photo.file_path)}
-                        className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
-                        muted
-                        playsInline
-                        preload="metadata"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <div className="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center">
-                          <svg className="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <>
+            {/* Toolbar: sort + view mode */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6 sm:mb-8 max-w-5xl mx-auto"
+            >
+              <p className="text-sm text-muted-foreground font-body">
+                {sortedPhotos.length} {sortedPhotos.length === 1 ? "minne" : "minnen"} delade
+              </p>
+              <div className="flex items-center gap-2">
+                {/* Sort toggle */}
+                <div className="inline-flex rounded-full border border-blush/40 bg-card/60 backdrop-blur-sm p-1 shadow-sm">
+                  <button
+                    onClick={() => setSortOrder("newest")}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-body transition-all ${
+                      sortOrder === "newest"
+                        ? "bg-gradient-to-r from-dusty-rose/80 to-blush text-white shadow"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <ArrowDownWideNarrow className="w-3.5 h-3.5" />
+                    Nyast
+                  </button>
+                  <button
+                    onClick={() => setSortOrder("oldest")}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-body transition-all ${
+                      sortOrder === "oldest"
+                        ? "bg-gradient-to-r from-dusty-rose/80 to-blush text-white shadow"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <ArrowUpWideNarrow className="w-3.5 h-3.5" />
+                    Äldst
+                  </button>
+                </div>
+                {/* View toggle */}
+                <div className="inline-flex rounded-full border border-blush/40 bg-card/60 backdrop-blur-sm p-1 shadow-sm">
+                  <button
+                    onClick={() => setViewMode("grid")}
+                    aria-label="Rutnät"
+                    className={`p-1.5 rounded-full transition-all ${
+                      viewMode === "grid"
+                        ? "bg-gradient-to-r from-dusty-rose/80 to-blush text-white shadow"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <LayoutGrid className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode("list")}
+                    aria-label="Lista"
+                    className={`p-1.5 rounded-full transition-all ${
+                      viewMode === "list"
+                        ? "bg-gradient-to-r from-dusty-rose/80 to-blush text-white shadow"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <List className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+
+            {viewMode === "grid" ? (
+              <div className="columns-2 md:columns-3 lg:columns-4 gap-2 sm:gap-4 space-y-2 sm:space-y-4">
+                {sortedPhotos.map((photo, index) => (
+                  <motion.div
+                    key={photo.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: Math.min(index * 0.03, 0.3) }}
+                    className="break-inside-avoid cursor-pointer group"
+                    onClick={() => {
+                      setSelectedPhotoIndex(index);
+                      supabase.rpc('increment_view_count', { photo_id: photo.id }).then();
+                    }}
+                  >
+                    <div className="relative overflow-hidden rounded-2xl shadow-soft border border-blush/30 group-hover:border-dusty-rose/50 transition-all duration-500 group-hover:shadow-lg group-hover:-translate-y-1">
+                      {isVideo(photo.file_name) ? (
+                        <>
+                          <video
+                            src={getImageUrl(photo.file_path)}
+                            className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+                            muted
+                            playsInline
+                            preload="metadata"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div className="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center">
+                              <svg className="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <HeicImage
+                          src={getImageUrl(photo.file_path)}
+                          fileName={photo.file_name}
+                          alt={photo.file_name}
+                          className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+                          loading="lazy"
+                        />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-dusty-rose/40 via-transparent to-soft-pink/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="absolute inset-0 ring-2 ring-inset ring-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="max-w-3xl mx-auto space-y-6 sm:space-y-8">
+                {sortedPhotos.map((photo, index) => {
+                  const date = new Date(photo.created_at);
+                  const dateStr = date.toLocaleDateString("sv-SE", { day: "numeric", month: "long", year: "numeric" });
+                  const timeStr = date.toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" });
+                  return (
+                    <motion.article
+                      key={photo.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-80px" }}
+                      transition={{ duration: 0.5, delay: Math.min(index * 0.04, 0.2) }}
+                      className="group bg-gradient-to-br from-card via-soft-pink/10 to-blush/20 rounded-3xl border border-blush/30 shadow-card hover:shadow-lg overflow-hidden transition-all duration-500 hover:-translate-y-0.5 cursor-pointer"
+                      onClick={() => {
+                        setSelectedPhotoIndex(index);
+                        supabase.rpc('increment_view_count', { photo_id: photo.id }).then();
+                      }}
+                    >
+                      <div className="flex items-center justify-between px-5 sm:px-6 py-3 border-b border-blush/20">
+                        <div className="flex items-center gap-2 text-sm text-foreground/80 font-body">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blush to-dusty-rose/60 flex items-center justify-center">
+                            <User className="w-4 h-4 text-white" />
+                          </div>
+                          <span className="font-medium">{photo.uploaded_by || "Anonym gäst"}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-body">
+                          <Calendar className="w-3.5 h-3.5" />
+                          <span>{dateStr}</span>
+                          <span className="opacity-50">·</span>
+                          <span>{timeStr}</span>
                         </div>
                       </div>
-                    </>
-                  ) : (
-                    <HeicImage
-                      src={getImageUrl(photo.file_path)}
-                      fileName={photo.file_name}
-                      alt={photo.file_name}
-                      className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-dusty-rose/40 via-transparent to-soft-pink/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="absolute inset-0 ring-2 ring-inset ring-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                      <div className="relative bg-black/5 overflow-hidden">
+                        {isVideo(photo.file_name) ? (
+                          <>
+                            <video
+                              src={getImageUrl(photo.file_path)}
+                              className="w-full max-h-[80vh] object-contain transition-transform duration-700 group-hover:scale-[1.01]"
+                              muted
+                              playsInline
+                              preload="metadata"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                              <div className="w-16 h-16 rounded-full bg-black/50 flex items-center justify-center shadow-lg">
+                                <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <HeicImage
+                            src={getImageUrl(photo.file_path)}
+                            fileName={photo.file_name}
+                            alt={photo.file_name}
+                            className="w-full max-h-[80vh] object-contain transition-transform duration-700 group-hover:scale-[1.01]"
+                            loading="lazy"
+                          />
+                        )}
+                      </div>
+                      {photo.caption && (
+                        <div className="px-5 sm:px-6 py-3 text-sm text-foreground/80 font-body italic">
+                          "{photo.caption}"
+                        </div>
+                      )}
+                    </motion.article>
+                  );
+                })}
+              </div>
+            )}
+          </>
         )}
 
         {/* Lightbox with navigation */}
