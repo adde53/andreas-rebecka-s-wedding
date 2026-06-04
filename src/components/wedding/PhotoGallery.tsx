@@ -551,7 +551,7 @@ const PhotoGallery = () => {
 
         {/* Lightbox with navigation */}
         <AnimatePresence>
-          {selectedPhotoIndex !== null && photos[selectedPhotoIndex] && (
+          {selectedPhotoIndex !== null && sortedPhotos[selectedPhotoIndex] && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -575,7 +575,7 @@ const PhotoGallery = () => {
                     e.stopPropagation();
                     const newIndex = selectedPhotoIndex - 1;
                     setSelectedPhotoIndex(newIndex);
-                    supabase.rpc('increment_view_count', { photo_id: photos[newIndex].id }).then();
+                    supabase.rpc('increment_view_count', { photo_id: sortedPhotos[newIndex].id }).then();
                   }}
                 >
                   <ChevronLeft className="w-8 h-8" />
@@ -583,14 +583,14 @@ const PhotoGallery = () => {
               )}
 
               {/* Next button */}
-              {selectedPhotoIndex < photos.length - 1 && (
+              {selectedPhotoIndex < sortedPhotos.length - 1 && (
                 <button
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white z-10 p-2 rounded-full bg-black/30 hover:bg-black/50 transition-colors"
                   onClick={(e) => {
                     e.stopPropagation();
                     const newIndex = selectedPhotoIndex + 1;
                     setSelectedPhotoIndex(newIndex);
-                    supabase.rpc('increment_view_count', { photo_id: photos[newIndex].id }).then();
+                    supabase.rpc('increment_view_count', { photo_id: sortedPhotos[newIndex].id }).then();
                   }}
                 >
                   <ChevronRight className="w-8 h-8" />
@@ -598,14 +598,14 @@ const PhotoGallery = () => {
               )}
 
               {/* Media */}
-              {isVideo(photos[selectedPhotoIndex].file_name) ? (
+              {isVideo(sortedPhotos[selectedPhotoIndex].file_name) ? (
                 <motion.video
-                  key={photos[selectedPhotoIndex].id}
+                  key={sortedPhotos[selectedPhotoIndex].id}
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.9, opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  src={getImageUrl(photos[selectedPhotoIndex].file_path)}
+                  src={getImageUrl(sortedPhotos[selectedPhotoIndex].file_path)}
                   controls
                   autoPlay
                   playsInline
@@ -614,7 +614,7 @@ const PhotoGallery = () => {
                 />
               ) : (
                 <motion.div
-                  key={photos[selectedPhotoIndex].id}
+                  key={sortedPhotos[selectedPhotoIndex].id}
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.9, opacity: 0 }}
@@ -622,9 +622,9 @@ const PhotoGallery = () => {
                   onClick={(e) => e.stopPropagation()}
                 >
                   <HeicImage
-                    src={getImageUrl(photos[selectedPhotoIndex].file_path)}
-                    fileName={photos[selectedPhotoIndex].file_name}
-                    alt={photos[selectedPhotoIndex].file_name}
+                    src={getImageUrl(sortedPhotos[selectedPhotoIndex].file_path)}
+                    fileName={sortedPhotos[selectedPhotoIndex].file_name}
+                    alt={sortedPhotos[selectedPhotoIndex].file_name}
                     className="max-w-full max-h-[90vh] object-contain rounded-lg"
                   />
                 </motion.div>
@@ -632,7 +632,7 @@ const PhotoGallery = () => {
 
               {/* Photo counter */}
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/70 font-body text-sm">
-                {selectedPhotoIndex + 1} / {photos.length}
+                {selectedPhotoIndex + 1} / {sortedPhotos.length}
               </div>
             </motion.div>
           )}
