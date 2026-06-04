@@ -411,10 +411,6 @@ const Admin = () => {
           .eq("id", photo.id);
         if (dbErr) throw dbErr;
 
-        // Remove old HEIC file if path changed
-        if (finalPath !== photo.file_path) {
-          await supabase.storage.from("wedding-photos").remove([photo.file_path]);
-        }
 
         setPhotos(prev => prev.map(p =>
           p.id === photo.id ? { ...p, file_path: finalPath, file_name: newName } : p
