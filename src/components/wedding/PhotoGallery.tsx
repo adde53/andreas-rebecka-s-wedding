@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, Camera, X, Loader2, Image as ImageIcon, Lock, ChevronLeft, ChevronRight } from "lucide-react";
+import { Upload, Camera, X, Loader2, Image as ImageIcon, Lock, ChevronLeft, ChevronRight, LayoutGrid, List, ArrowDownWideNarrow, ArrowUpWideNarrow, Calendar, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
