@@ -27,7 +27,19 @@ const PhotoGallery = () => {
   const [uploadsEnabled, setUploadsEnabled] = useState(false);
   const [uploadEnabledFrom, setUploadEnabledFrom] = useState<Date | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const { toast } = useToast();
+
+  const sortedPhotos = useMemo(() => {
+    const arr = [...photos];
+    arr.sort((a, b) => {
+      const da = new Date(a.created_at).getTime();
+      const db = new Date(b.created_at).getTime();
+      return sortOrder === "newest" ? db - da : da - db;
+    });
+    return arr;
+  }, [photos, sortOrder]);
 
   useEffect(() => {
     fetchPhotos();
