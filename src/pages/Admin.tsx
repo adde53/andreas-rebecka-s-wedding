@@ -31,6 +31,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import HeicImage from "@/components/HeicImage";
+import VisitorStats from "@/components/admin/VisitorStats";
 
 interface Photo {
   id: string;
@@ -520,6 +521,8 @@ const Admin = () => {
           </TabsList>
 
           <TabsContent value="photos" className="space-y-8">
+            <VisitorStats />
+
             {/* Action buttons */}
             {photos.length > 0 && (
               <div className="flex justify-end gap-2 flex-wrap">
