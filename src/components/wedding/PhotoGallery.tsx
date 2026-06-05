@@ -584,13 +584,24 @@ const PhotoGallery = () => {
               className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
               onClick={() => setSelectedPhotoIndex(null)}
             >
-              {/* Close button */}
-              <button
-                className="absolute top-4 right-4 text-white/80 hover:text-white z-10"
-                onClick={() => setSelectedPhotoIndex(null)}
-              >
-                <X className="w-8 h-8" />
-              </button>
+              {/* Top-right actions */}
+              <div className="absolute top-4 right-4 z-10 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                <button
+                  className="flex items-center gap-1.5 text-white/90 hover:text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-body transition-colors"
+                  onClick={(e) => handleDownload(sortedPhotos[selectedPhotoIndex!], e)}
+                  aria-label="Ladda ner"
+                >
+                  <Download className="w-4 h-4" />
+                  <span className="hidden sm:inline">Ladda ner</span>
+                </button>
+                <button
+                  className="text-white/80 hover:text-white p-1.5 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors"
+                  onClick={() => setSelectedPhotoIndex(null)}
+                  aria-label="Stäng"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
 
               {/* Previous button */}
               {selectedPhotoIndex > 0 && (
