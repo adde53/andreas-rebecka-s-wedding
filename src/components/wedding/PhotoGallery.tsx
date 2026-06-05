@@ -175,6 +175,28 @@ const PhotoGallery = () => {
   const isVideo = (fileName: string) =>
     /\.(mp4|mov|webm|m4v|3gp|3gpp|quicktime)$/i.test(fileName);
 
+  const handleDownload = async (photo: Photo, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    try {
+      const url = getImageUrl(photo.file_path);
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = photo.file_name || "bild";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(blobUrl);
+      supabase.rpc("increment_download_count", { photo_id: photo.id }).then();
+      toast({ title: "Nedladdning startad", description: photo.file_name });
+    } catch (err) {
+      console.error("Download error:", err);
+      toast({ title: "Kunde inte ladda ner", variant: "destructive" });
+    }
+  };
+
   return (
     <section className="py-16 sm:py-24 bg-gradient-to-b from-soft-pink/20 via-blush/10 to-background relative overflow-hidden" id="gallery">
       {/* Decorative background elements */}
