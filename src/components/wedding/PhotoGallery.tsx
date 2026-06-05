@@ -52,6 +52,7 @@ const PhotoGallery = () => {
         .from("photos")
         .select("*")
         .eq("approved", true)
+        .eq("category", "wedding")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -134,6 +135,7 @@ const PhotoGallery = () => {
           file_path: filePath,
           file_name: file.name,
           uploaded_by: uploaderName || "Anonym gäst",
+          category: "wedding",
         });
 
         if (dbError) throw dbError;

@@ -6,6 +6,7 @@ import WeddingDetails from "@/components/wedding/WeddingDetails";
 import TravelInfo from "@/components/wedding/TravelInfo";
 import GoodToKnow from "@/components/wedding/GoodToKnow";
 import PhotoGallery from "@/components/wedding/PhotoGallery";
+import HoneymoonSection from "@/components/wedding/HoneymoonSection";
 import Footer from "@/components/wedding/Footer";
 import PostWeddingPage from "@/components/wedding/PostWeddingPage";
 import { supabase } from "@/integrations/supabase/client";
@@ -74,6 +75,7 @@ const Index = () => {
         <GoodToKnow />
       </div>
       <PhotoGallery />
+      <HoneymoonSection />
       <Footer />
     </div>
   );
