@@ -1157,6 +1157,10 @@ const Admin = () => {
                       <p className="text-white/70 font-body text-xs">
                         {format(new Date(selectedPhoto.created_at), "d MMMM yyyy 'kl' HH:mm", { locale: sv })}
                       </p>
+                      <div className="flex items-center gap-3 mt-1 text-white/80 text-xs font-body">
+                        <span className="inline-flex items-center gap-1"><Eye className="w-3 h-3" /> {selectedPhoto.view_count ?? 0} visningar</span>
+                        <span className="inline-flex items-center gap-1"><Download className="w-3 h-3" /> {selectedPhoto.download_count ?? 0} nedladdningar</span>
+                      </div>
                     </div>
                     <div className="flex gap-2 flex-wrap">
                       <Button
