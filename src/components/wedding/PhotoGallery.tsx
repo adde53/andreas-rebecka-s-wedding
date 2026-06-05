@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, Camera, X, Loader2, Image as ImageIcon, Lock, ChevronLeft, ChevronRight, LayoutGrid, List, ArrowDownWideNarrow, ArrowUpWideNarrow, Calendar, User } from "lucide-react";
+import { Upload, Camera, X, Loader2, Image as ImageIcon, Lock, ChevronLeft, ChevronRight, LayoutGrid, List, ArrowDownWideNarrow, ArrowUpWideNarrow, Calendar, User, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -174,6 +174,28 @@ const PhotoGallery = () => {
 
   const isVideo = (fileName: string) =>
     /\.(mp4|mov|webm|m4v|3gp|3gpp|quicktime)$/i.test(fileName);
+
+  const handleDownload = async (photo: Photo, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    try {
+      const url = getImageUrl(photo.file_path);
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = photo.file_name || "bild";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(blobUrl);
+      supabase.rpc("increment_download_count", { photo_id: photo.id }).then();
+      toast({ title: "Nedladdning startad", description: photo.file_name });
+    } catch (err) {
+      console.error("Download error:", err);
+      toast({ title: "Kunde inte ladda ner", variant: "destructive" });
+    }
+  };
 
   return (
     <section className="py-16 sm:py-24 bg-gradient-to-b from-soft-pink/20 via-blush/10 to-background relative overflow-hidden" id="gallery">
@@ -374,9 +396,12 @@ const PhotoGallery = () => {
               transition={{ duration: 0.5 }}
               className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6 sm:mb-8 max-w-5xl mx-auto"
             >
-              <p className="text-sm text-muted-foreground font-body">
-                {sortedPhotos.length} {sortedPhotos.length === 1 ? "minne" : "minnen"} delade
-              </p>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blush/40 to-soft-pink/40 border border-blush/40 shadow-sm">
+                <ImageIcon className="w-4 h-4 text-dusty-rose" />
+                <p className="text-sm text-foreground font-body">
+                  <span className="font-serif text-base text-dusty-rose font-medium">{sortedPhotos.length}</span> {sortedPhotos.length === 1 ? "minne delat" : "minnen delade"}
+                </p>
+              </div>
               <div className="flex items-center gap-2">
                 {/* Sort toggle */}
                 <div className="inline-flex rounded-full border border-blush/40 bg-card/60 backdrop-blur-sm p-1 shadow-sm">
@@ -559,13 +584,24 @@ const PhotoGallery = () => {
               className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
               onClick={() => setSelectedPhotoIndex(null)}
             >
-              {/* Close button */}
-              <button
-                className="absolute top-4 right-4 text-white/80 hover:text-white z-10"
-                onClick={() => setSelectedPhotoIndex(null)}
-              >
-                <X className="w-8 h-8" />
-              </button>
+              {/* Top-right actions */}
+              <div className="absolute top-4 right-4 z-10 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                <button
+                  className="flex items-center gap-1.5 text-white/90 hover:text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-body transition-colors"
+                  onClick={(e) => handleDownload(sortedPhotos[selectedPhotoIndex!], e)}
+                  aria-label="Ladda ner"
+                >
+                  <Download className="w-4 h-4" />
+                  <span className="hidden sm:inline">Ladda ner</span>
+                </button>
+                <button
+                  className="text-white/80 hover:text-white p-1.5 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors"
+                  onClick={() => setSelectedPhotoIndex(null)}
+                  aria-label="Stäng"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
 
               {/* Previous button */}
               {selectedPhotoIndex > 0 && (

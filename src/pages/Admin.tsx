@@ -43,6 +43,7 @@ interface Photo {
   approved: boolean;
   rejected: boolean;
   view_count: number;
+  download_count: number;
 }
 
 interface WeddingSettings {
@@ -285,12 +286,20 @@ const Admin = () => {
           decoding="async"
         />
       )}
-      {photo.view_count > 0 && (
-        <div className="absolute bottom-1 right-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded-full flex items-center gap-1">
-          <Eye className="w-3 h-3" />
-          {photo.view_count}
-        </div>
-      )}
+      <div className="absolute bottom-1 right-1 flex gap-1">
+        {photo.view_count > 0 && (
+          <div className="bg-black/60 text-white text-xs px-1.5 py-0.5 rounded-full flex items-center gap-1">
+            <Eye className="w-3 h-3" />
+            {photo.view_count}
+          </div>
+        )}
+        {photo.download_count > 0 && (
+          <div className="bg-primary/80 text-white text-xs px-1.5 py-0.5 rounded-full flex items-center gap-1">
+            <Download className="w-3 h-3" />
+            {photo.download_count}
+          </div>
+        )}
+      </div>
     </div>
   );
 
@@ -1148,6 +1157,10 @@ const Admin = () => {
                       <p className="text-white/70 font-body text-xs">
                         {format(new Date(selectedPhoto.created_at), "d MMMM yyyy 'kl' HH:mm", { locale: sv })}
                       </p>
+                      <div className="flex items-center gap-3 mt-1 text-white/80 text-xs font-body">
+                        <span className="inline-flex items-center gap-1"><Eye className="w-3 h-3" /> {selectedPhoto.view_count ?? 0} visningar</span>
+                        <span className="inline-flex items-center gap-1"><Download className="w-3 h-3" /> {selectedPhoto.download_count ?? 0} nedladdningar</span>
+                      </div>
                     </div>
                     <div className="flex gap-2 flex-wrap">
                       <Button
