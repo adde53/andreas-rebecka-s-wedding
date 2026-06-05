@@ -52,6 +52,7 @@ const PhotoGallery = () => {
         .from("photos")
         .select("*")
         .eq("approved", true)
+        .eq("category", "wedding")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
