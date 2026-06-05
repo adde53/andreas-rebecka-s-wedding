@@ -19,6 +19,7 @@ export type Database = {
           approved: boolean
           caption: string | null
           created_at: string
+          download_count: number
           file_name: string
           file_path: string
           id: string
@@ -31,6 +32,7 @@ export type Database = {
           approved?: boolean
           caption?: string | null
           created_at?: string
+          download_count?: number
           file_name: string
           file_path: string
           id?: string
@@ -43,6 +45,7 @@ export type Database = {
           approved?: boolean
           caption?: string | null
           created_at?: string
+          download_count?: number
           file_name?: string
           file_path?: string
           id?: string
@@ -139,6 +142,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_download_count: {
+        Args: { photo_id: string }
+        Returns: undefined
       }
       increment_view_count: { Args: { photo_id: string }; Returns: undefined }
       uploads_enabled: { Args: never; Returns: boolean }
