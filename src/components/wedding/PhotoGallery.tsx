@@ -396,9 +396,12 @@ const PhotoGallery = () => {
               transition={{ duration: 0.5 }}
               className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6 sm:mb-8 max-w-5xl mx-auto"
             >
-              <p className="text-sm text-muted-foreground font-body">
-                {sortedPhotos.length} {sortedPhotos.length === 1 ? "minne" : "minnen"} delade
-              </p>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blush/40 to-soft-pink/40 border border-blush/40 shadow-sm">
+                <ImageIcon className="w-4 h-4 text-dusty-rose" />
+                <p className="text-sm text-foreground font-body">
+                  <span className="font-serif text-base text-dusty-rose font-medium">{sortedPhotos.length}</span> {sortedPhotos.length === 1 ? "minne delat" : "minnen delade"}
+                </p>
+              </div>
               <div className="flex items-center gap-2">
                 {/* Sort toggle */}
                 <div className="inline-flex rounded-full border border-blush/40 bg-card/60 backdrop-blur-sm p-1 shadow-sm">
