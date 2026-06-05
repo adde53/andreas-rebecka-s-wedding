@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           approved: boolean
           caption: string | null
+          category: string
           created_at: string
           download_count: number
           file_name: string
@@ -31,6 +32,7 @@ export type Database = {
         Insert: {
           approved?: boolean
           caption?: string | null
+          category?: string
           created_at?: string
           download_count?: number
           file_name: string
@@ -44,6 +46,7 @@ export type Database = {
         Update: {
           approved?: boolean
           caption?: string | null
+          category?: string
           created_at?: string
           download_count?: number
           file_name?: string
