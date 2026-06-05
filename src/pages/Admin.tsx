@@ -43,6 +43,7 @@ interface Photo {
   approved: boolean;
   rejected: boolean;
   view_count: number;
+  download_count: number;
 }
 
 interface WeddingSettings {
