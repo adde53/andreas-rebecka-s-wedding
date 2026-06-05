@@ -135,6 +135,7 @@ const PhotoGallery = () => {
           file_path: filePath,
           file_name: file.name,
           uploaded_by: uploaderName || "Anonym gäst",
+          category: "wedding",
         });
 
         if (dbError) throw dbError;
