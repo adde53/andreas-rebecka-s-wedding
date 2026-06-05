@@ -75,6 +75,7 @@ const Index = () => {
         <GoodToKnow />
       </div>
       <PhotoGallery />
+      <HoneymoonSection />
       <Footer />
     </div>
   );
