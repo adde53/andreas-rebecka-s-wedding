@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
 import PhotoGallery from "./PhotoGallery";
+import HoneymoonSection from "./HoneymoonSection";
 
 const PostWeddingPage = () => {
   return (
@@ -82,6 +83,9 @@ const PostWeddingPage = () => {
 
       {/* Photo Gallery */}
       <PhotoGallery />
+
+      {/* Honeymoon */}
+      <HoneymoonSection />
 
       {/* Simple Footer */}
       <footer className="py-12 bg-sage/10">
