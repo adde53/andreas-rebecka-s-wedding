@@ -84,6 +84,9 @@ const PostWeddingPage = () => {
       {/* Photo Gallery */}
       <PhotoGallery />
 
+      {/* Honeymoon */}
+      <HoneymoonSection />
+
       {/* Simple Footer */}
       <footer className="py-12 bg-sage/10">
         <div className="container mx-auto px-4 text-center">
