@@ -499,13 +499,19 @@ const Admin = () => {
       <header className="bg-card border-b border-border sticky top-0 z-10">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-serif text-foreground">Admin</h1>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/honeymoon">
+                <Plane className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Bröllopsresan</span>
+              </Link>
+            </Button>
             <span className="text-sm text-muted-foreground font-body hidden sm:block">
               {user?.email}
             </span>
             <Button variant="outline" size="sm" onClick={handleSignOut}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Logga ut
+              <LogOut className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Logga ut</span>
             </Button>
           </div>
         </div>
