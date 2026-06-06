@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
 import PhotoGallery from "./PhotoGallery";
+import HoneymoonSection from "./HoneymoonSection";
 
 const PostWeddingPage = () => {
   return (
