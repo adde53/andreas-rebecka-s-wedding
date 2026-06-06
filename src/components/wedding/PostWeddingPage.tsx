@@ -1,5 +1,7 @@
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Heart } from "lucide-react";
+import { ArrowRight, Heart, Plane } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import PhotoGallery from "./PhotoGallery";
 import HoneymoonSection from "./HoneymoonSection";
 
@@ -67,6 +69,21 @@ const PostWeddingPage = () => {
             Vi är så tacksamma för varje skratt, kram och dans vi delade tillsammans. 
             Era minnen är ovärderliga för oss – dela gärna era bilder nedan!
           </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.55 }}
+            className="mb-8 flex justify-center"
+          >
+            <Button asChild size="lg" className="min-h-14 w-full max-w-sm px-8 font-body text-base shadow-soft">
+              <Link to="/honeymoon">
+                <Plane className="w-5 h-5" />
+                Se bröllopsresan
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </Button>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}

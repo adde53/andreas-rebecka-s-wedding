@@ -519,6 +519,26 @@ const Admin = () => {
       </header>
 
       <main className="container mx-auto px-6 py-8">
+        <section className="mb-8">
+          <div className="rounded-3xl border border-border bg-card px-5 py-5 shadow-soft sm:px-6 sm:py-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1">
+                <h2 className="font-serif text-2xl text-foreground">Bröllopsresan</h2>
+                <p className="font-body text-sm text-muted-foreground">
+                  Ladda upp innehåll som bara hör till bröllopsresan.
+                </p>
+              </div>
+
+              <Button asChild size="lg" className="min-h-14 w-full sm:w-auto px-8 font-body text-base">
+                <Link to="/honeymoon#honeymoon-upload">
+                  <Plane className="w-5 h-5" />
+                  Ladda upp till bröllopsresan
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+
         <Tabs defaultValue="photos" className="space-y-6">
           <TabsList>
             <TabsTrigger value="photos" className="font-body">
