@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
@@ -33,6 +33,7 @@ interface Photo {
 const Honeymoon = () => {
   const { isAdmin } = useAuth();
   const { toast } = useToast();
+  const location = useLocation();
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
@@ -43,6 +44,20 @@ const Honeymoon = () => {
   useEffect(() => {
     fetchPhotos();
   }, []);
+
+  useEffect(() => {
+    const hash = location.hash.replace("#", "");
+    if (!hash) return;
+
+    const timeout = window.setTimeout(() => {
+      document.getElementById(hash)?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 250);
+
+    return () => window.clearTimeout(timeout);
+  }, [location.hash, isAdmin]);
 
   const fetchPhotos = async () => {
     try {
@@ -185,12 +200,23 @@ const Honeymoon = () => {
           <p className="text-muted-foreground font-body max-w-xl mx-auto text-base sm:text-lg leading-relaxed">
             En liten samling minnen från vår resa som nygifta.
           </p>
+
+          {isAdmin && (
+            <div className="mt-8 flex justify-center">
+              <Button asChild size="lg" className="min-h-14 w-full max-w-sm px-8 font-body text-base shadow-soft">
+                <a href="#honeymoon-upload">
+                  <Upload className="w-5 h-5" />
+                  Ladda upp till bröllopsresan
+                </a>
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
       {/* Admin upload */}
       {isAdmin && (
-        <section className="container mx-auto px-4 sm:px-6 mb-12">
+        <section id="honeymoon-upload" className="container mx-auto px-4 sm:px-6 mb-12 scroll-mt-24">
           <div className="max-w-md mx-auto bg-gradient-to-br from-card via-soft-pink/20 to-sage/15 p-6 rounded-2xl shadow-card border border-blush/30">
             <p className="text-sm font-body text-foreground/80 mb-3 font-medium">
               Ladda upp bilder från bröllopsresan
