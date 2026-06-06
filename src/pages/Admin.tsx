@@ -18,7 +18,8 @@ import {
   Eye,
   ChevronLeft,
   ChevronRight,
-  Wand2
+  Wand2,
+  Plane
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
