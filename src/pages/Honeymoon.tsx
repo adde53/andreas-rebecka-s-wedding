@@ -174,6 +174,20 @@ const Honeymoon = () => {
     setUploading(true);
     try {
       for (let file of selectedFiles) {
+        const originalFile = file;
+        // Försök läsa fotots faktiska datum från EXIF innan ev. HEIC-konvertering
+        let takenAt: string | null = null;
+        try {
+          const exif = await exifr.parse(originalFile, ["DateTimeOriginal", "CreateDate"]);
+          const dt = exif?.DateTimeOriginal ?? exif?.CreateDate;
+          if (dt) takenAt = new Date(dt).toISOString();
+        } catch {
+          // ignorera EXIF-fel
+        }
+        if (!takenAt && originalFile.lastModified) {
+          takenAt = new Date(originalFile.lastModified).toISOString();
+        }
+
         file = await convertHeic(file);
         const ext = file.name.split(".").pop();
         const path = `honeymoon/${Date.now()}-${Math.random()
@@ -190,6 +204,7 @@ const Honeymoon = () => {
           caption: caption || null,
           category: "honeymoon",
           approved: true,
+          taken_at: takenAt,
         });
         if (dbErr) throw dbErr;
       }
