@@ -76,7 +76,61 @@ const Honeymoon = () => {
     }
   };
 
-  const sorted = useMemo(() => photos, [photos]);
+  const sorted = useMemo(
+    () =>
+      [...photos].sort(
+        (a, b) =>
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      ),
+    [photos]
+  );
+
+  // Honeymoon dag 1 startar 5 juni 2026. Natt/tidig morgon (innan kl 05) räknas
+  // till föregående dag eftersom vi inte gått och lagt oss än.
+  const HONEYMOON_START = new Date("2026-06-05T00:00:00+02:00");
+  const NIGHT_CUTOFF_HOURS = 5;
+
+  const getDayNumber = (iso: string) => {
+    const d = new Date(iso);
+    const adjusted = new Date(d.getTime() - NIGHT_CUTOFF_HOURS * 3600 * 1000);
+    const start = new Date(
+      HONEYMOON_START.getFullYear(),
+      HONEYMOON_START.getMonth(),
+      HONEYMOON_START.getDate()
+    );
+    const day = new Date(
+      adjusted.getFullYear(),
+      adjusted.getMonth(),
+      adjusted.getDate()
+    );
+    const diff = Math.floor(
+      (day.getTime() - start.getTime()) / (24 * 3600 * 1000)
+    );
+    return diff + 1;
+  };
+
+  const grouped = useMemo(() => {
+    const map = new Map<number, Photo[]>();
+    sorted.forEach((p) => {
+      const day = getDayNumber(p.created_at);
+      if (day < 1) return;
+      if (!map.has(day)) map.set(day, []);
+      map.get(day)!.push(p);
+    });
+    return Array.from(map.entries()).sort((a, b) => a[0] - b[0]);
+  }, [sorted]);
+
+  const dayDate = (day: number) => {
+    const d = new Date(HONEYMOON_START);
+    d.setDate(d.getDate() + (day - 1));
+    return `${d.getDate()}/${d.getMonth() + 1}`;
+  };
+
+  // Platt lista i visningsordning (för lightbox-navigering)
+  const flatPhotos = useMemo(
+    () => grouped.flatMap(([, ps]) => ps),
+    [grouped]
+  );
 
   const getUrl = (p: string) =>
     supabase.storage.from("wedding-photos").getPublicUrl(p).data.publicUrl;
@@ -281,7 +335,7 @@ const Honeymoon = () => {
           <div className="flex justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-sage" />
           </div>
-        ) : sorted.length === 0 ? (
+        ) : flatPhotos.length === 0 ? (
           <div className="text-center py-20">
             <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-sage/30 to-blush/20 flex items-center justify-center">
               <ImageIcon className="w-12 h-12 text-muted-foreground/40" />
@@ -294,57 +348,84 @@ const Honeymoon = () => {
             </p>
           </div>
         ) : (
-          <div className="columns-2 md:columns-3 lg:columns-4 gap-2 sm:gap-4 space-y-2 sm:space-y-4 max-w-6xl mx-auto">
-            {sorted.map((photo, index) => (
-              <motion.div
-                key={photo.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: Math.min(index * 0.03, 0.3) }}
-                className="break-inside-avoid cursor-pointer group"
-                onClick={() => {
-                  setSelectedIndex(index);
-                  supabase.rpc("increment_view_count", { photo_id: photo.id }).then();
-                }}
-              >
-                <div className="relative overflow-hidden rounded-2xl shadow-soft border border-sage/20 group-hover:border-sage/50 transition-all duration-500 group-hover:shadow-lg group-hover:-translate-y-1">
-                  {isVideo(photo.file_name) ? (
-                    <>
-                      <video
-                        src={getUrl(photo.file_path)}
-                        className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
-                        muted
-                        playsInline
-                        preload="metadata"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <div className="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center">
-                          <svg className="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z" />
-                          </svg>
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <HeicImage
-                      src={getUrl(photo.file_path)}
-                      fileName={photo.file_name}
-                      alt={photo.file_name}
-                      className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                  )}
+          <div className="max-w-6xl mx-auto space-y-12">
+            {grouped.map(([day, dayPhotos]) => {
+              const startOffset = flatPhotos.findIndex(
+                (p) => p.id === dayPhotos[0].id
+              );
+              return (
+                <div key={day}>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-sage/40 to-sage/40" />
+                    <div className="text-center">
+                      <h2 className="font-serif text-2xl sm:text-3xl text-foreground">
+                        Dag {day}
+                      </h2>
+                      <p className="text-xs sm:text-sm tracking-[0.2em] uppercase text-muted-foreground font-body mt-1">
+                        {dayDate(day)}
+                      </p>
+                    </div>
+                    <div className="flex-1 h-px bg-gradient-to-l from-transparent via-sage/40 to-sage/40" />
+                  </div>
+                  <div className="columns-2 md:columns-3 lg:columns-4 gap-2 sm:gap-4 space-y-2 sm:space-y-4">
+                    {dayPhotos.map((photo, i) => {
+                      const flatIndex = startOffset + i;
+                      return (
+                        <motion.div
+                          key={photo.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 0.5, delay: Math.min(i * 0.03, 0.3) }}
+                          className="break-inside-avoid cursor-pointer group"
+                          onClick={() => {
+                            setSelectedIndex(flatIndex);
+                            supabase.rpc("increment_view_count", { photo_id: photo.id }).then();
+                          }}
+                        >
+                          <div className="relative overflow-hidden rounded-2xl shadow-soft border border-sage/20 group-hover:border-sage/50 transition-all duration-500 group-hover:shadow-lg group-hover:-translate-y-1">
+                            {isVideo(photo.file_name) ? (
+                              <>
+                                <video
+                                  src={getUrl(photo.file_path)}
+                                  className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+                                  muted
+                                  playsInline
+                                  preload="metadata"
+                                />
+                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                  <div className="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center">
+                                    <svg className="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                  </div>
+                                </div>
+                              </>
+                            ) : (
+                              <HeicImage
+                                src={getUrl(photo.file_path)}
+                                fileName={photo.file_name}
+                                alt={photo.file_name}
+                                className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+                                loading="lazy"
+                              />
+                            )}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </motion.div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>
 
+
       {/* Lightbox */}
       <AnimatePresence>
-        {selectedIndex !== null && sorted[selectedIndex] && (
+        {selectedIndex !== null && flatPhotos[selectedIndex] && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -355,7 +436,7 @@ const Honeymoon = () => {
             <div className="absolute top-4 right-4 z-10 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
               <button
                 className="flex items-center gap-1.5 text-white/90 hover:text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-body transition-colors"
-                onClick={(e) => handleDownload(sorted[selectedIndex!], e)}
+                onClick={(e) => handleDownload(flatPhotos[selectedIndex!], e)}
               >
                 <Download className="w-4 h-4" />
                 <span className="hidden sm:inline">Ladda ner</span>
@@ -379,7 +460,7 @@ const Honeymoon = () => {
                 <ChevronLeft className="w-8 h-8" />
               </button>
             )}
-            {selectedIndex < sorted.length - 1 && (
+            {selectedIndex < flatPhotos.length - 1 && (
               <button
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white z-10 p-2 rounded-full bg-black/30 hover:bg-black/50 transition-colors"
                 onClick={(e) => {
@@ -391,10 +472,10 @@ const Honeymoon = () => {
               </button>
             )}
 
-            {isVideo(sorted[selectedIndex].file_name) ? (
+            {isVideo(flatPhotos[selectedIndex].file_name) ? (
               <video
-                key={sorted[selectedIndex].id}
-                src={getUrl(sorted[selectedIndex].file_path)}
+                key={flatPhotos[selectedIndex].id}
+                src={getUrl(flatPhotos[selectedIndex].file_path)}
                 controls
                 autoPlay
                 playsInline
@@ -404,16 +485,16 @@ const Honeymoon = () => {
             ) : (
               <div onClick={(e) => e.stopPropagation()}>
                 <HeicImage
-                  src={getUrl(sorted[selectedIndex].file_path)}
-                  fileName={sorted[selectedIndex].file_name}
-                  alt={sorted[selectedIndex].file_name}
+                  src={getUrl(flatPhotos[selectedIndex].file_path)}
+                  fileName={flatPhotos[selectedIndex].file_name}
+                  alt={flatPhotos[selectedIndex].file_name}
                   className="max-w-full max-h-[90vh] object-contain rounded-lg"
                 />
               </div>
             )}
 
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/70 font-body text-sm">
-              {selectedIndex + 1} / {sorted.length}
+              {selectedIndex + 1} / {flatPhotos.length}
             </div>
           </motion.div>
         )}
