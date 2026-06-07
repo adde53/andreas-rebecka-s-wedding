@@ -26,6 +26,7 @@ export type Database = {
           id: string
           photo_type: string
           rejected: boolean
+          taken_at: string | null
           uploaded_at: string
           uploaded_by: string | null
           view_count: number
@@ -41,6 +42,7 @@ export type Database = {
           id?: string
           photo_type?: string
           rejected?: boolean
+          taken_at?: string | null
           uploaded_at?: string
           uploaded_by?: string | null
           view_count?: number
@@ -56,6 +58,7 @@ export type Database = {
           id?: string
           photo_type?: string
           rejected?: boolean
+          taken_at?: string | null
           uploaded_at?: string
           uploaded_by?: string | null
           view_count?: number

@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import heic2any from "heic2any";
+import exifr from "exifr";
 import HeicImage from "@/components/HeicImage";
 
 interface Photo {
@@ -28,6 +29,7 @@ interface Photo {
   uploaded_by: string | null;
   caption: string | null;
   created_at: string;
+  taken_at: string | null;
 }
 
 const Honeymoon = () => {
@@ -76,11 +78,13 @@ const Honeymoon = () => {
     }
   };
 
+  const photoDate = (p: Photo) => p.taken_at ?? p.created_at;
+
   const sorted = useMemo(
     () =>
       [...photos].sort(
         (a, b) =>
-          new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+          new Date(photoDate(a)).getTime() - new Date(photoDate(b)).getTime()
       ),
     [photos]
   );
@@ -116,7 +120,7 @@ const Honeymoon = () => {
   const grouped = useMemo(() => {
     const map = new Map<number, Photo[]>();
     sorted.forEach((p) => {
-      const day = getDayNumber(p.created_at);
+      const day = getDayNumber(photoDate(p));
       if (day < 1) return;
       if (!map.has(day)) map.set(day, []);
       map.get(day)!.push(p);
@@ -170,6 +174,20 @@ const Honeymoon = () => {
     setUploading(true);
     try {
       for (let file of selectedFiles) {
+        const originalFile = file;
+        // Försök läsa fotots faktiska datum från EXIF innan ev. HEIC-konvertering
+        let takenAt: string | null = null;
+        try {
+          const exif = await exifr.parse(originalFile, ["DateTimeOriginal", "CreateDate"]);
+          const dt = exif?.DateTimeOriginal ?? exif?.CreateDate;
+          if (dt) takenAt = new Date(dt).toISOString();
+        } catch {
+          // ignorera EXIF-fel
+        }
+        if (!takenAt && originalFile.lastModified) {
+          takenAt = new Date(originalFile.lastModified).toISOString();
+        }
+
         file = await convertHeic(file);
         const ext = file.name.split(".").pop();
         const path = `honeymoon/${Date.now()}-${Math.random()
@@ -186,6 +204,7 @@ const Honeymoon = () => {
           caption: caption || null,
           category: "honeymoon",
           approved: true,
+          taken_at: takenAt,
         });
         if (dbErr) throw dbErr;
       }
