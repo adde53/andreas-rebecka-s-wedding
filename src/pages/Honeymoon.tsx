@@ -78,11 +78,13 @@ const Honeymoon = () => {
     }
   };
 
+  const photoDate = (p: Photo) => p.taken_at ?? p.created_at;
+
   const sorted = useMemo(
     () =>
       [...photos].sort(
         (a, b) =>
-          new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+          new Date(photoDate(a)).getTime() - new Date(photoDate(b)).getTime()
       ),
     [photos]
   );
@@ -118,7 +120,7 @@ const Honeymoon = () => {
   const grouped = useMemo(() => {
     const map = new Map<number, Photo[]>();
     sorted.forEach((p) => {
-      const day = getDayNumber(p.created_at);
+      const day = getDayNumber(photoDate(p));
       if (day < 1) return;
       if (!map.has(day)) map.set(day, []);
       map.get(day)!.push(p);
