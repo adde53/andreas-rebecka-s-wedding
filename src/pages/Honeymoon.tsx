@@ -348,53 +348,80 @@ const Honeymoon = () => {
             </p>
           </div>
         ) : (
-          <div className="columns-2 md:columns-3 lg:columns-4 gap-2 sm:gap-4 space-y-2 sm:space-y-4 max-w-6xl mx-auto">
-            {sorted.map((photo, index) => (
-              <motion.div
-                key={photo.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: Math.min(index * 0.03, 0.3) }}
-                className="break-inside-avoid cursor-pointer group"
-                onClick={() => {
-                  setSelectedIndex(index);
-                  supabase.rpc("increment_view_count", { photo_id: photo.id }).then();
-                }}
-              >
-                <div className="relative overflow-hidden rounded-2xl shadow-soft border border-sage/20 group-hover:border-sage/50 transition-all duration-500 group-hover:shadow-lg group-hover:-translate-y-1">
-                  {isVideo(photo.file_name) ? (
-                    <>
-                      <video
-                        src={getUrl(photo.file_path)}
-                        className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
-                        muted
-                        playsInline
-                        preload="metadata"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <div className="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center">
-                          <svg className="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z" />
-                          </svg>
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <HeicImage
-                      src={getUrl(photo.file_path)}
-                      fileName={photo.file_name}
-                      alt={photo.file_name}
-                      className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                  )}
+          <div className="max-w-6xl mx-auto space-y-12">
+            {grouped.map(([day, dayPhotos]) => {
+              const startOffset = flatPhotos.findIndex(
+                (p) => p.id === dayPhotos[0].id
+              );
+              return (
+                <div key={day}>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-sage/40 to-sage/40" />
+                    <div className="text-center">
+                      <h2 className="font-serif text-2xl sm:text-3xl text-foreground">
+                        Dag {day}
+                      </h2>
+                      <p className="text-xs sm:text-sm tracking-[0.2em] uppercase text-muted-foreground font-body mt-1">
+                        {dayDate(day)}
+                      </p>
+                    </div>
+                    <div className="flex-1 h-px bg-gradient-to-l from-transparent via-sage/40 to-sage/40" />
+                  </div>
+                  <div className="columns-2 md:columns-3 lg:columns-4 gap-2 sm:gap-4 space-y-2 sm:space-y-4">
+                    {dayPhotos.map((photo, i) => {
+                      const flatIndex = startOffset + i;
+                      return (
+                        <motion.div
+                          key={photo.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 0.5, delay: Math.min(i * 0.03, 0.3) }}
+                          className="break-inside-avoid cursor-pointer group"
+                          onClick={() => {
+                            setSelectedIndex(flatIndex);
+                            supabase.rpc("increment_view_count", { photo_id: photo.id }).then();
+                          }}
+                        >
+                          <div className="relative overflow-hidden rounded-2xl shadow-soft border border-sage/20 group-hover:border-sage/50 transition-all duration-500 group-hover:shadow-lg group-hover:-translate-y-1">
+                            {isVideo(photo.file_name) ? (
+                              <>
+                                <video
+                                  src={getUrl(photo.file_path)}
+                                  className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+                                  muted
+                                  playsInline
+                                  preload="metadata"
+                                />
+                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                  <div className="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center">
+                                    <svg className="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                  </div>
+                                </div>
+                              </>
+                            ) : (
+                              <HeicImage
+                                src={getUrl(photo.file_path)}
+                                fileName={photo.file_name}
+                                alt={photo.file_name}
+                                className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+                                loading="lazy"
+                              />
+                            )}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </motion.div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>
+
 
       {/* Lightbox */}
       <AnimatePresence>
