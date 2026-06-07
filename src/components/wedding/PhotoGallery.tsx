@@ -241,7 +241,8 @@ const PhotoGallery = () => {
           </p>
         </motion.div>
 
-        {/* Upload section */}
+        {/* Upload section — endast admin */}
+        {isAdmin && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
