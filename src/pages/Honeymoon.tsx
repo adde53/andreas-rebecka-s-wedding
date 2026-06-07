@@ -109,6 +109,10 @@ const Honeymoon = () => {
     return diff + 1;
   };
 
+  const currentDay = useMemo(() => {
+    return Math.max(1, getDayNumber(new Date().toISOString()));
+  }, []);
+
   const grouped = useMemo(() => {
     const map = new Map<number, Photo[]>();
     sorted.forEach((p) => {
@@ -117,8 +121,18 @@ const Honeymoon = () => {
       if (!map.has(day)) map.set(day, []);
       map.get(day)!.push(p);
     });
-    return Array.from(map.entries()).sort((a, b) => a[0] - b[0]);
-  }, [sorted]);
+    const maxDay = Math.max(
+      currentDay,
+      ...Array.from(map.keys()),
+      1
+    );
+    const all: Array<[number, Photo[]]> = [];
+    for (let d = 1; d <= maxDay; d++) {
+      all.push([d, map.get(d) ?? []]);
+    }
+    return all;
+  }, [sorted, currentDay]);
+
 
   const dayDate = (day: number) => {
     const d = new Date(HONEYMOON_START);
