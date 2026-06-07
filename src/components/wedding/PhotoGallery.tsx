@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import heic2any from "heic2any";
 import HeicImage from "@/components/HeicImage";
 
@@ -19,6 +20,7 @@ interface Photo {
 }
 
 const PhotoGallery = () => {
+  const { isAdmin } = useAuth();
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploaderName, setUploaderName] = useState("");
@@ -239,7 +241,8 @@ const PhotoGallery = () => {
           </p>
         </motion.div>
 
-        {/* Upload section */}
+        {/* Upload section — endast admin */}
+        {isAdmin && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -366,6 +369,8 @@ const PhotoGallery = () => {
             )}
           </div>
         </motion.div>
+        )}
+
 
         {/* Photo grid */}
         {loading ? (

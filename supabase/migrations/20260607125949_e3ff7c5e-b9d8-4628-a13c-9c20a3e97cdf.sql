@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Guests can upload wedding photos when enabled" ON public.photos;
