@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import heic2any from "heic2any";
+import exifr from "exifr";
 import HeicImage from "@/components/HeicImage";
 
 interface Photo {
@@ -28,6 +29,7 @@ interface Photo {
   uploaded_by: string | null;
   caption: string | null;
   created_at: string;
+  taken_at: string | null;
 }
 
 const Honeymoon = () => {
