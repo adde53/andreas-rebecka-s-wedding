@@ -109,6 +109,10 @@ const Honeymoon = () => {
     return diff + 1;
   };
 
+  const currentDay = useMemo(() => {
+    return Math.max(1, getDayNumber(new Date().toISOString()));
+  }, []);
+
   const grouped = useMemo(() => {
     const map = new Map<number, Photo[]>();
     sorted.forEach((p) => {
@@ -117,8 +121,18 @@ const Honeymoon = () => {
       if (!map.has(day)) map.set(day, []);
       map.get(day)!.push(p);
     });
-    return Array.from(map.entries()).sort((a, b) => a[0] - b[0]);
-  }, [sorted]);
+    const maxDay = Math.max(
+      currentDay,
+      ...Array.from(map.keys()),
+      1
+    );
+    const all: Array<[number, Photo[]]> = [];
+    for (let d = 1; d <= maxDay; d++) {
+      all.push([d, map.get(d) ?? []]);
+    }
+    return all;
+  }, [sorted, currentDay]);
+
 
   const dayDate = (day: number) => {
     const d = new Date(HONEYMOON_START);
@@ -335,25 +349,14 @@ const Honeymoon = () => {
           <div className="flex justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-sage" />
           </div>
-        ) : flatPhotos.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-sage/30 to-blush/20 flex items-center justify-center">
-              <ImageIcon className="w-12 h-12 text-muted-foreground/40" />
-            </div>
-            <p className="text-muted-foreground font-body text-lg">
-              Inga bilder från bröllopsresan ännu
-            </p>
-            <p className="text-muted-foreground/60 font-body text-sm mt-2">
-              Kom tillbaka snart för att följa med på äventyret!
-            </p>
-          </div>
         ) : (
           <div className="max-w-6xl mx-auto space-y-12">
             {grouped.map(([day, dayPhotos]) => {
-              const startOffset = flatPhotos.findIndex(
-                (p) => p.id === dayPhotos[0].id
-              );
+              const startOffset = dayPhotos.length
+                ? flatPhotos.findIndex((p) => p.id === dayPhotos[0].id)
+                : 0;
               return (
+
                 <div key={day}>
                   <div className="flex items-center gap-4 mb-6">
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-sage/40 to-sage/40" />
@@ -367,7 +370,16 @@ const Honeymoon = () => {
                     </div>
                     <div className="flex-1 h-px bg-gradient-to-l from-transparent via-sage/40 to-sage/40" />
                   </div>
+                  {dayPhotos.length === 0 ? (
+                    <div className="text-center py-8 rounded-2xl border border-dashed border-sage/30 bg-sage/5">
+                      <ImageIcon className="w-8 h-8 mx-auto text-muted-foreground/40 mb-2" />
+                      <p className="text-sm text-muted-foreground/70 font-body italic">
+                        Inga bilder ännu — kom tillbaka snart
+                      </p>
+                    </div>
+                  ) : (
                   <div className="columns-2 md:columns-3 lg:columns-4 gap-2 sm:gap-4 space-y-2 sm:space-y-4">
+
                     {dayPhotos.map((photo, i) => {
                       const flatIndex = startOffset + i;
                       return (
@@ -415,6 +427,8 @@ const Honeymoon = () => {
                       );
                     })}
                   </div>
+                  )}
+
                 </div>
               );
             })}
