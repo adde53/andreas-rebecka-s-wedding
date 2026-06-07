@@ -349,25 +349,14 @@ const Honeymoon = () => {
           <div className="flex justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-sage" />
           </div>
-        ) : flatPhotos.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-sage/30 to-blush/20 flex items-center justify-center">
-              <ImageIcon className="w-12 h-12 text-muted-foreground/40" />
-            </div>
-            <p className="text-muted-foreground font-body text-lg">
-              Inga bilder från bröllopsresan ännu
-            </p>
-            <p className="text-muted-foreground/60 font-body text-sm mt-2">
-              Kom tillbaka snart för att följa med på äventyret!
-            </p>
-          </div>
         ) : (
           <div className="max-w-6xl mx-auto space-y-12">
             {grouped.map(([day, dayPhotos]) => {
-              const startOffset = flatPhotos.findIndex(
-                (p) => p.id === dayPhotos[0].id
-              );
+              const startOffset = dayPhotos.length
+                ? flatPhotos.findIndex((p) => p.id === dayPhotos[0].id)
+                : 0;
               return (
+
                 <div key={day}>
                   <div className="flex items-center gap-4 mb-6">
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-sage/40 to-sage/40" />
