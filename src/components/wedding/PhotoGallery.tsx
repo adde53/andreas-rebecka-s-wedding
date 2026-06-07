@@ -20,6 +20,7 @@ interface Photo {
 }
 
 const PhotoGallery = () => {
+  const { isAdmin } = useAuth();
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploaderName, setUploaderName] = useState("");
