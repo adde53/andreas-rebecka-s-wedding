@@ -370,7 +370,16 @@ const Honeymoon = () => {
                     </div>
                     <div className="flex-1 h-px bg-gradient-to-l from-transparent via-sage/40 to-sage/40" />
                   </div>
+                  {dayPhotos.length === 0 ? (
+                    <div className="text-center py-8 rounded-2xl border border-dashed border-sage/30 bg-sage/5">
+                      <ImageIcon className="w-8 h-8 mx-auto text-muted-foreground/40 mb-2" />
+                      <p className="text-sm text-muted-foreground/70 font-body italic">
+                        Inga bilder ännu — kom tillbaka snart
+                      </p>
+                    </div>
+                  ) : (
                   <div className="columns-2 md:columns-3 lg:columns-4 gap-2 sm:gap-4 space-y-2 sm:space-y-4">
+
                     {dayPhotos.map((photo, i) => {
                       const flatIndex = startOffset + i;
                       return (
