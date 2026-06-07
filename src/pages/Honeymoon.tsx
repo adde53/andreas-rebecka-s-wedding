@@ -76,7 +76,61 @@ const Honeymoon = () => {
     }
   };
 
-  const sorted = useMemo(() => photos, [photos]);
+  const sorted = useMemo(
+    () =>
+      [...photos].sort(
+        (a, b) =>
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      ),
+    [photos]
+  );
+
+  // Honeymoon dag 1 startar 5 juni 2026. Natt/tidig morgon (innan kl 05) räknas
+  // till föregående dag eftersom vi inte gått och lagt oss än.
+  const HONEYMOON_START = new Date("2026-06-05T00:00:00+02:00");
+  const NIGHT_CUTOFF_HOURS = 5;
+
+  const getDayNumber = (iso: string) => {
+    const d = new Date(iso);
+    const adjusted = new Date(d.getTime() - NIGHT_CUTOFF_HOURS * 3600 * 1000);
+    const start = new Date(
+      HONEYMOON_START.getFullYear(),
+      HONEYMOON_START.getMonth(),
+      HONEYMOON_START.getDate()
+    );
+    const day = new Date(
+      adjusted.getFullYear(),
+      adjusted.getMonth(),
+      adjusted.getDate()
+    );
+    const diff = Math.floor(
+      (day.getTime() - start.getTime()) / (24 * 3600 * 1000)
+    );
+    return diff + 1;
+  };
+
+  const grouped = useMemo(() => {
+    const map = new Map<number, Photo[]>();
+    sorted.forEach((p) => {
+      const day = getDayNumber(p.created_at);
+      if (day < 1) return;
+      if (!map.has(day)) map.set(day, []);
+      map.get(day)!.push(p);
+    });
+    return Array.from(map.entries()).sort((a, b) => a[0] - b[0]);
+  }, [sorted]);
+
+  const dayDate = (day: number) => {
+    const d = new Date(HONEYMOON_START);
+    d.setDate(d.getDate() + (day - 1));
+    return `${d.getDate()}/${d.getMonth() + 1}`;
+  };
+
+  // Platt lista i visningsordning (för lightbox-navigering)
+  const flatPhotos = useMemo(
+    () => grouped.flatMap(([, ps]) => ps),
+    [grouped]
+  );
 
   const getUrl = (p: string) =>
     supabase.storage.from("wedding-photos").getPublicUrl(p).data.publicUrl;
