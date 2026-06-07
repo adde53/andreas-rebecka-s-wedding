@@ -335,7 +335,7 @@ const Honeymoon = () => {
           <div className="flex justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-sage" />
           </div>
-        ) : sorted.length === 0 ? (
+        ) : flatPhotos.length === 0 ? (
           <div className="text-center py-20">
             <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-sage/30 to-blush/20 flex items-center justify-center">
               <ImageIcon className="w-12 h-12 text-muted-foreground/40" />
@@ -425,7 +425,7 @@ const Honeymoon = () => {
 
       {/* Lightbox */}
       <AnimatePresence>
-        {selectedIndex !== null && sorted[selectedIndex] && (
+        {selectedIndex !== null && flatPhotos[selectedIndex] && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -436,7 +436,7 @@ const Honeymoon = () => {
             <div className="absolute top-4 right-4 z-10 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
               <button
                 className="flex items-center gap-1.5 text-white/90 hover:text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-body transition-colors"
-                onClick={(e) => handleDownload(sorted[selectedIndex!], e)}
+                onClick={(e) => handleDownload(flatPhotos[selectedIndex!], e)}
               >
                 <Download className="w-4 h-4" />
                 <span className="hidden sm:inline">Ladda ner</span>
@@ -460,7 +460,7 @@ const Honeymoon = () => {
                 <ChevronLeft className="w-8 h-8" />
               </button>
             )}
-            {selectedIndex < sorted.length - 1 && (
+            {selectedIndex < flatPhotos.length - 1 && (
               <button
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white z-10 p-2 rounded-full bg-black/30 hover:bg-black/50 transition-colors"
                 onClick={(e) => {
@@ -472,10 +472,10 @@ const Honeymoon = () => {
               </button>
             )}
 
-            {isVideo(sorted[selectedIndex].file_name) ? (
+            {isVideo(flatPhotos[selectedIndex].file_name) ? (
               <video
-                key={sorted[selectedIndex].id}
-                src={getUrl(sorted[selectedIndex].file_path)}
+                key={flatPhotos[selectedIndex].id}
+                src={getUrl(flatPhotos[selectedIndex].file_path)}
                 controls
                 autoPlay
                 playsInline
@@ -485,16 +485,16 @@ const Honeymoon = () => {
             ) : (
               <div onClick={(e) => e.stopPropagation()}>
                 <HeicImage
-                  src={getUrl(sorted[selectedIndex].file_path)}
-                  fileName={sorted[selectedIndex].file_name}
-                  alt={sorted[selectedIndex].file_name}
+                  src={getUrl(flatPhotos[selectedIndex].file_path)}
+                  fileName={flatPhotos[selectedIndex].file_name}
+                  alt={flatPhotos[selectedIndex].file_name}
                   className="max-w-full max-h-[90vh] object-contain rounded-lg"
                 />
               </div>
             )}
 
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/70 font-body text-sm">
-              {selectedIndex + 1} / {sorted.length}
+              {selectedIndex + 1} / {flatPhotos.length}
             </div>
           </motion.div>
         )}
