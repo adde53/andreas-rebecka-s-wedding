@@ -369,6 +369,8 @@ const PhotoGallery = () => {
             )}
           </div>
         </motion.div>
+        )}
+
 
         {/* Photo grid */}
         {loading ? (
