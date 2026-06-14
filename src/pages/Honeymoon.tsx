@@ -89,9 +89,9 @@ const Honeymoon = () => {
     [photos]
   );
 
-  // Honeymoon dag 1 startar 5 juni 2026. Natt/tidig morgon (innan kl 05) räknas
+  // Honeymoon dag 1 startar 6 juni 2026. Natt/tidig morgon (innan kl 05) räknas
   // till föregående dag eftersom vi inte gått och lagt oss än.
-  const HONEYMOON_START = new Date("2026-06-05T00:00:00+02:00");
+  const HONEYMOON_START = new Date("2026-06-06T00:00:00+02:00");
   const NIGHT_CUTOFF_HOURS = 5;
 
   const getDayNumber = (iso: string) => {
@@ -113,35 +113,39 @@ const Honeymoon = () => {
     return diff + 1;
   };
 
-  const currentDay = useMemo(() => {
-    return Math.max(1, getDayNumber(new Date().toISOString()));
-  }, []);
+  const TOTAL_DAYS = 8; // Dag 1–8 (hela resan)
 
   const grouped = useMemo(() => {
     const map = new Map<number, Photo[]>();
     sorted.forEach((p) => {
       const day = getDayNumber(photoDate(p));
-      if (day < 1) return;
+      if (day < 1 || day > TOTAL_DAYS) return;
       if (!map.has(day)) map.set(day, []);
       map.get(day)!.push(p);
     });
-    const maxDay = Math.max(
-      currentDay,
-      ...Array.from(map.keys()),
-      1
-    );
     const all: Array<[number, Photo[]]> = [];
-    for (let d = 1; d <= maxDay; d++) {
+    for (let d = 1; d <= TOTAL_DAYS; d++) {
       all.push([d, map.get(d) ?? []]);
     }
     return all;
-  }, [sorted, currentDay]);
+  }, [sorted]);
 
 
   const dayDate = (day: number) => {
     const d = new Date(HONEYMOON_START);
     d.setDate(d.getDate() + (day - 1));
-    return `${d.getDate()}/${d.getMonth() + 1}`;
+    return d.toLocaleDateString("sv-SE", { day: "numeric", month: "long" });
+  };
+
+  const dayLabels: Record<number, string> = {
+    1: "Avresa",
+    2: "Dag 2",
+    3: "Dag 3",
+    4: "Dag 4",
+    5: "Dag 5",
+    6: "Dag 6",
+    7: "Dag 7",
+    8: "Hemresa",
   };
 
   // Platt lista i visningsordning (för lightbox-navigering)
@@ -381,7 +385,7 @@ const Honeymoon = () => {
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-sage/40 to-sage/40" />
                     <div className="text-center">
                       <h2 className="font-serif text-2xl sm:text-3xl text-foreground">
-                        Dag {day}
+                        {dayLabels[day] || `Dag ${day}`}
                       </h2>
                       <p className="text-xs sm:text-sm tracking-[0.2em] uppercase text-muted-foreground font-body mt-1">
                         {dayDate(day)}
