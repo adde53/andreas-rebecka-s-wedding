@@ -139,6 +139,10 @@ const GoodToKnow = () => {
                 src={swishQr} 
                 alt="Swish QR-kod till Lucas Olsson för bröllopsresa" 
                 className="w-48 sm:w-56 h-auto"
+                loading="lazy"
+                decoding="async"
+                width={224}
+                height={224}
               />
             </div>
           </div>

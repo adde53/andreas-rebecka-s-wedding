@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import heic2any from "heic2any";
 
 interface HeicImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
@@ -11,10 +10,21 @@ const isHeicFile = (src: string, fileName?: string): boolean => {
   return heicPattern.test(src) || (!!fileName && heicPattern.test(fileName));
 };
 
-const HeicImage = ({ src, fileName, ...props }: HeicImageProps) => {
-  const [convertedSrc, setConvertedSrc] = useState<string | null>(null);
+// Lazy-load heic2any only when needed (it's ~1.3MB)
+let heic2anyModule: typeof import("heic2any") | null = null;
+const getHeic2Any = async () => {
+  if (!heic2anyModule) {
+    heic2anyModule = import("heic2any");
+  }
+  const mod = await heic2anyModule;
+  return mod.default;
+};
+
+const HeicImage = ({ src, fileName, loading = "lazy", ...props }: HeicImageProps) => {
+  const needsConversion = isHeicFile(src, fileName);
+  const [convertedSrc, setConvertedSrc] = useState<string | null>(needsConversion ? null : src);
   const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(needsConversion);
   const blobUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -26,12 +36,12 @@ const HeicImage = ({ src, fileName, ...props }: HeicImageProps) => {
 
     if (!isHeicFile(src, fileName)) {
       setConvertedSrc(src);
-      setLoading(false);
+      setIsLoading(false);
       return;
     }
 
     let cancelled = false;
-    setLoading(true);
+    setIsLoading(true);
     setError(false);
 
     const convert = async () => {
@@ -42,29 +52,28 @@ const HeicImage = ({ src, fileName, ...props }: HeicImageProps) => {
         }
         const blob = await response.blob();
 
-        // Always force HEIC mime type since we know from filename it's HEIC
         const heicBlob = new Blob([await blob.arrayBuffer()], { type: "image/heic" });
 
+        const heic2any = await getHeic2Any();
         const result = await heic2any({
           blob: heicBlob,
           toType: "image/jpeg",
           quality: 0.85
         });
 
-        // heic2any can return a single blob or array of blobs
         const jpegBlob = Array.isArray(result) ? result[0] : result;
 
         if (!cancelled) {
           const url = URL.createObjectURL(jpegBlob);
           blobUrlRef.current = url;
           setConvertedSrc(url);
-          setLoading(false);
+          setIsLoading(false);
         }
       } catch (e) {
         console.error("HEIC conversion failed for:", fileName || src, e);
         if (!cancelled) {
           setError(true);
-          setLoading(false);
+          setIsLoading(false);
         }
       }
     };
@@ -84,9 +93,21 @@ const HeicImage = ({ src, fileName, ...props }: HeicImageProps) => {
     };
   }, []);
 
-  if (loading) {
+  // Only show placeholder for HEIC files that are being converted
+  if (isLoading) {
     return (
-      <div className={props.className} style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#f3f4f6", minHeight: "100px" }}>
+      <div
+        className={props.className}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#f3f4f6",
+          minHeight: "100px",
+        }}
+        role="img"
+        aria-label="Laddar bild..."
+      >
         <span className="text-xs text-gray-400 animate-pulse">Konverterar bild...</span>
       </div>
     );
@@ -94,16 +115,30 @@ const HeicImage = ({ src, fileName, ...props }: HeicImageProps) => {
 
   if (error) {
     return (
-      <div className={props.className} style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#f3f4f6", minHeight: "100px" }}>
+      <div
+        className={props.className}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#f3f4f6",
+          minHeight: "100px",
+        }}
+      >
         <span className="text-xs text-gray-500">Kunde inte visa bilden</span>
       </div>
     );
   }
 
-  return <img {...props} src={convertedSrc!} />;
+  return (
+    <img
+      {...props}
+      src={convertedSrc!}
+      loading={loading}
+      decoding="async"
+    />
+  );
 };
 
 export default HeicImage;
 export { isHeicFile };
-
-

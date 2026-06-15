@@ -18,9 +18,10 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import heic2any from "heic2any";
 import exifr from "exifr";
 import HeicImage from "@/components/HeicImage";
+import LazyVideo from "@/components/LazyVideo";
+import { getImageUrl, isVideo } from "@/lib/imageUtils";
 
 interface Photo {
   id: string;
@@ -154,15 +155,12 @@ const Honeymoon = () => {
     [grouped]
   );
 
-  const getUrl = (p: string) =>
-    supabase.storage.from("wedding-photos").getPublicUrl(p).data.publicUrl;
-
-  const isVideo = (n: string) =>
-    /\.(mp4|mov|webm|m4v|3gp|3gpp|quicktime)$/i.test(n);
+  const getUrl = (p: string) => getImageUrl(p);
 
   const convertHeic = async (file: File): Promise<File> => {
     if (!/\.(heic|heif)$/i.test(file.name) && !file.type.includes("heic"))
       return file;
+    const { default: heic2any } = await import("heic2any");
     const blob = (await heic2any({
       blob: file,
       toType: "image/jpeg",
@@ -420,22 +418,10 @@ const Honeymoon = () => {
                         >
                           <div className="relative overflow-hidden rounded-2xl shadow-soft border border-sage/20 group-hover:border-sage/50 transition-all duration-500 group-hover:shadow-lg group-hover:-translate-y-1">
                             {isVideo(photo.file_name) ? (
-                              <>
-                                <video
-                                  src={getUrl(photo.file_path)}
-                                  className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
-                                  muted
-                                  playsInline
-                                  preload="metadata"
-                                />
-                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                  <div className="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center">
-                                    <svg className="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                                      <path d="M8 5v14l11-7z" />
-                                    </svg>
-                                  </div>
-                                </div>
-                              </>
+                              <LazyVideo
+                                src={getUrl(photo.file_path)}
+                                className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+                              />
                             ) : (
                               <HeicImage
                                 src={getUrl(photo.file_path)}

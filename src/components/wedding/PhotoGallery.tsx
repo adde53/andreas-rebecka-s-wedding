@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import heic2any from "heic2any";
 import HeicImage from "@/components/HeicImage";
+import LazyVideo from "@/components/LazyVideo";
+import { getImageUrl, isVideo } from "@/lib/imageUtils";
 
 interface Photo {
   id: string;
@@ -108,6 +109,7 @@ const PhotoGallery = () => {
     if (!heicExtensions.test(file.name) && !file.type.includes("heic") && !file.type.includes("heif")) {
       return file;
     }
+    const { default: heic2any } = await import("heic2any");
     const blob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.85 }) as Blob;
     const newName = file.name.replace(/\.(heic|heif)$/i, ".jpg");
     return new File([blob], newName, { type: "image/jpeg" });
@@ -169,15 +171,7 @@ const PhotoGallery = () => {
     setSelectedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const getImageUrl = (filePath: string) => {
-    const { data } = supabase.storage
-      .from("wedding-photos")
-      .getPublicUrl(filePath);
-    return data.publicUrl;
-  };
 
-  const isVideo = (fileName: string) =>
-    /\.(mp4|mov|webm|m4v|3gp|3gpp|quicktime)$/i.test(fileName);
 
   const handleDownload = async (photo: Photo, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -480,20 +474,10 @@ const PhotoGallery = () => {
                   >
                     <div className="relative overflow-hidden rounded-2xl shadow-soft border border-blush/30 group-hover:border-dusty-rose/50 transition-all duration-500 group-hover:shadow-lg group-hover:-translate-y-1">
                       {isVideo(photo.file_name) ? (
-                        <>
-                          <video
-                            src={getImageUrl(photo.file_path)}
-                            className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
-                            muted
-                            playsInline
-                            preload="metadata"
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <div className="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center">
-                              <svg className="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                            </div>
-                          </div>
-                        </>
+                        <LazyVideo
+                          src={getImageUrl(photo.file_path)}
+                          className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
                       ) : (
                         <HeicImage
                           src={getImageUrl(photo.file_path)}
@@ -544,20 +528,10 @@ const PhotoGallery = () => {
                       </div>
                       <div className="relative bg-black/5 overflow-hidden">
                         {isVideo(photo.file_name) ? (
-                          <>
-                            <video
-                              src={getImageUrl(photo.file_path)}
-                              className="w-full max-h-[80vh] object-contain transition-transform duration-700 group-hover:scale-[1.01]"
-                              muted
-                              playsInline
-                              preload="metadata"
-                            />
-                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                              <div className="w-16 h-16 rounded-full bg-black/50 flex items-center justify-center shadow-lg">
-                                <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                              </div>
-                            </div>
-                          </>
+                          <LazyVideo
+                            src={getImageUrl(photo.file_path)}
+                            className="w-full max-h-[80vh] object-contain transition-transform duration-700 group-hover:scale-[1.01]"
+                          />
                         ) : (
                           <HeicImage
                             src={getImageUrl(photo.file_path)}
