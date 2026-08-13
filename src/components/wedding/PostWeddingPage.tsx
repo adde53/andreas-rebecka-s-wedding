@@ -109,6 +109,9 @@ const PostWeddingPage = () => {
       {/* Photo Gallery */}
       <PhotoGallery />
 
+      {/* Fotografens bilder */}
+      <PhotographerSection />
+
       {/* Honeymoon */}
       <HoneymoonSection />
 

@@ -498,6 +498,12 @@ const Admin = () => {
           <h1 className="text-2xl font-serif text-foreground">Admin</h1>
           <div className="flex items-center gap-2 sm:gap-4">
             <Button variant="outline" size="sm" asChild>
+              <Link to="/photographer">
+                <Camera className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Fotografen</span>
+              </Link>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
               <Link to="/honeymoon">
                 <Plane className="w-4 h-4 sm:mr-2" />
                 <span className="hidden sm:inline">Bröllopsresan</span>
