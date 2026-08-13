@@ -5,11 +5,11 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  base: "/",
   server: {
     host: "::",
     port: 8080,
     headers: {
-      // Cache static assets aggressively in dev too
       "Cache-Control": "public, max-age=31536000, immutable",
     },
   },
