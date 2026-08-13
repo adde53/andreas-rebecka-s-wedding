@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Heart, Plane } from "lucide-react";
+import { ArrowRight, Heart, Plane, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PhotoGallery from "./PhotoGallery";
 import HoneymoonSection from "./HoneymoonSection";
+import PhotographerSection from "./PhotographerSection";
 
 const PostWeddingPage = () => {
   return (
@@ -74,9 +75,16 @@ const PostWeddingPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.55 }}
-            className="mb-8 flex justify-center"
+            className="mb-8 flex flex-col sm:flex-row items-center justify-center gap-3"
           >
-            <Button asChild size="lg" className="min-h-14 w-full max-w-sm px-8 font-body text-base shadow-soft">
+            <Button asChild size="lg" className="min-h-14 w-full max-w-sm sm:w-auto px-8 font-body text-base shadow-soft">
+              <Link to="/photographer">
+                <Camera className="w-5 h-5" />
+                Fotografens bilder
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="min-h-14 w-full max-w-sm sm:w-auto px-8 font-body text-base shadow-soft">
               <Link to="/honeymoon">
                 <Plane className="w-5 h-5" />
                 Se bröllopsresan
@@ -100,6 +108,9 @@ const PostWeddingPage = () => {
 
       {/* Photo Gallery */}
       <PhotoGallery />
+
+      {/* Fotografens bilder */}
+      <PhotographerSection />
 
       {/* Honeymoon */}
       <HoneymoonSection />
