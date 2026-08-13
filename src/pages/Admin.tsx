@@ -19,7 +19,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Wand2,
-  Plane
+  Plane,
+  Camera
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -498,6 +499,12 @@ const Admin = () => {
           <h1 className="text-2xl font-serif text-foreground">Admin</h1>
           <div className="flex items-center gap-2 sm:gap-4">
             <Button variant="outline" size="sm" asChild>
+              <Link to="/photographer">
+                <Camera className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Fotografen</span>
+              </Link>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
               <Link to="/honeymoon">
                 <Plane className="w-4 h-4 sm:mr-2" />
                 <span className="hidden sm:inline">Bröllopsresan</span>
@@ -529,6 +536,26 @@ const Admin = () => {
                 <Link to="/honeymoon#honeymoon-upload">
                   <Plane className="w-5 h-5" />
                   Ladda upp till bröllopsresan
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        <section className="mb-8">
+          <div className="rounded-3xl border border-border bg-card px-5 py-5 shadow-soft sm:px-6 sm:py-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1">
+                <h2 className="font-serif text-2xl text-foreground">Fotografens bilder</h2>
+                <p className="font-body text-sm text-muted-foreground">
+                  Ladda upp alla bilder från fotografen — hundratals filer på en gång.
+                </p>
+              </div>
+
+              <Button asChild size="lg" className="min-h-14 w-full sm:w-auto px-8 font-body text-base">
+                <Link to="/photographer#photographer-upload">
+                  <Camera className="w-5 h-5" />
+                  Ladda upp fotografens bilder
                 </Link>
               </Button>
             </div>
