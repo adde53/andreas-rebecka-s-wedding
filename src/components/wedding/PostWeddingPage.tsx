@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Heart, Plane } from "lucide-react";
+import { ArrowRight, Heart, Plane, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PhotoGallery from "./PhotoGallery";
 import HoneymoonSection from "./HoneymoonSection";
+import PhotographerSection from "./PhotographerSection";
 
 const PostWeddingPage = () => {
   return (
