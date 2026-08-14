@@ -228,9 +228,59 @@ const Photographer = () => {
           )}
 
           {isAdmin && (
-            <div className="mt-8 flex justify-center">
+            <div id="photographer-upload" className="mt-8 max-w-lg mx-auto scroll-mt-24">
+              <div className="bg-card/80 border border-blush/30 rounded-2xl p-6 shadow-card backdrop-blur-sm">
+                <p className="font-body text-sm text-muted-foreground mb-4">
+                  Endast admin: ladda upp fotografens bilder (stöder 600+ filer)
+                </p>
+                <label className="relative block">
+                  <input
+                    type="file"
+                    accept="image/*,video/*,.heic,.heif"
+                    multiple
+                    disabled={uploading}
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []);
+                      e.target.value = "";
+                      handleFiles(files);
+                    }}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                  />
+                  <Button className="w-full font-body" disabled={uploading} asChild>
+                    <span>
+                      {uploading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Laddar upp… {pct}%
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          Välj filer att ladda upp
+                        </>
+                      )}
+                    </span>
+                  </Button>
+                </label>
+
+                {uploading && (
+                  <div className="mt-4">
+                    <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                      <div
+                        className="h-full bg-sage transition-all duration-300"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    <p className="mt-2 text-xs font-body text-muted-foreground">
+                      {progress.done} / {progress.total} klara
+                      {progress.failed ? ` · ${progress.failed} misslyckades` : ""}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
+
         </div>
       </section>
 

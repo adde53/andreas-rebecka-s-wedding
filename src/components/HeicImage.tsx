@@ -11,7 +11,7 @@ const isHeicFile = (src: string, fileName?: string): boolean => {
 };
 
 // Lazy-load heic2any only when needed (it's ~1.3MB)
-let heic2anyModule: typeof import("heic2any") | null = null;
+let heic2anyModule: Promise<typeof import("heic2any")> | null = null;
 const getHeic2Any = async () => {
   if (!heic2anyModule) {
     heic2anyModule = import("heic2any");
